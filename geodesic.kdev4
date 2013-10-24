@@ -1,0 +1,4 @@
+[Project]
+Name=geodesic
+Manager=KDevCMakeManager
+VersionControl=kdevgit
