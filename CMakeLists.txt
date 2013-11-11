@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 2.6)
 
 project(geodesic)
 
-add_executable(geodesic tensors.cc space.cc runge.cc geod.cc)
+add_executable(geodesic io.cc task.cc tensors.cc space.cc runge.cc geod.cc)
 
 install(TARGETS geodesic RUNTIME DESTINATION bin)
 
