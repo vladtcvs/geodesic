@@ -44,8 +44,8 @@ start_data get_start()
   ioid id;
   char fname[10];
   
-  sprintf(fname, "out%05i", cnt);
-  id.out = fopen(fname, "wt");
+  
+  id.open(cnt);
   
   
   real Rs = 1;

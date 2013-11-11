@@ -38,15 +38,11 @@ poskas geodesic(poskas pos, real dh, real h1, int N, ioid id)
   
   for (i = 0; i < N; i++)
   {
-    for (j = 0; j < d; j++)
-      fprintf(id.out, "%lf ", (double)pk.p[j]);
-    fprintf(id.out, "\n");
+    if (id.write_poskas(pk) == -1) 
+      return pk;
     pk=geodesic_step(pk,dh,h1/N);
   }
-  for (j = 0; j < d; j++)
-      fprintf(id.out, "%lf ", (double)pk.p[j]);
-  fprintf(id.out, "\n");
-
+  id.write_poskas(pk);
   
   return pk;
 }
@@ -77,7 +73,7 @@ int main()
   
   start_data sd;
   
-  int nthr = 2;
+  int nthr = 4;
   pgthread *gth = new pgthread[nthr];
   
   

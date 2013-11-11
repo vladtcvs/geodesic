@@ -104,10 +104,12 @@ class poskas
 
 class ioid
 {
+   FILE *out;
    public:
-  FILE *out;
-
- 
+      void open(int ind);
+      void close();
+      int write_poskas(poskas pk);
+      
 };
 
 
