@@ -1,6 +1,6 @@
 #include "geod.h"
-
-//#include <glib.h>
+#include <unistd.h>
+#include <glib.h>
 
 const int deflen = 4;
 const real eps=1e-7;
@@ -59,21 +59,22 @@ struct start_data
   int N;
   FILE *out;
 };
-/*
+
 gpointer geodesic_glib(gpointer data)
 {
-  start_data *sd = data;
+  start_data *sd = (start_data*)data;
   poskas pk = sd->pk;
   real h1 = sd->h;
   real dh = sd->dh;
   int N = sd->N;
-  FILE *out = pk.out;
+  FILE *out = sd->out;
   geodesic(pk, dh, h1, N, out);
   
   return NULL;
 }
-*/
 
+
+typedef GThread * pgthread;
 
 int main()
 {
@@ -81,16 +82,20 @@ int main()
   real h;
   real h1=30;
   real dh=1e-2;
-  FILE *out = fopen("out", "wt");
+  FILE *out1 = fopen("out1", "wt"), *out2 = fopen("out2", "wt");
   
+  int i;
   real Rs = 1;
-  real R = 1.4999*Rs;
+  real R;
   real K = 1;
   real v = 1;
   
   start_data sd;
   
+  int nthr = 2;
+  pgthread *gth = new pgthread[nthr];
   
+  R=1.4999*Rs;
   
   pk.p[0] = 0;
   pk.p[1] = R;
@@ -98,17 +103,47 @@ int main()
   pk.v[0] = K;
   pk.v[3] = v*K*sqrt((R-Rs)/R)/R;
 
-  //g_thread_init(NULL);
+  
   sd.pk = pk;
   sd.N = 1000;
   sd.h = h1;
   sd.dh = dh;
-  sd.out = out;
-  //GThread *thread_id = g_thread_create(geodesic_glib, &sd, TRUE, NULL);
+  sd.out = out1;
   
-  geodesic(pk, dh, h1, 1000, out);
   
-  fclose(out);
   
+  gth[0] = g_thread_new("thread 0", geodesic_glib, (gpointer)(&sd));
+  
+  // ждем, чтобы поток успел скопировать данные
+  sleep(1);
+  
+  
+  R=1.5001*Rs;
+  
+  pk.p[0] = 0;
+  pk.p[1] = R;
+  pk.p[2] = PI/2;
+  pk.v[0] = K;
+  pk.v[3] = v*K*sqrt((R-Rs)/R)/R;
+
+  
+  sd.pk = pk;
+  sd.N = 1000;
+  sd.h = h1;
+  sd.dh = dh;
+  sd.out = out2;
+  
+  
+  
+  gth[1] = g_thread_new("thread 1", geodesic_glib, (gpointer)(&sd));
+  
+  // ждем окончания всех потоков
+  for (i = 0; i < nthr; i++)
+    g_thread_join(gth[i]);
+  
+  delete gth;
+  
+  fclose(out1);
+  fclose(out2);
   return 0;
 }
