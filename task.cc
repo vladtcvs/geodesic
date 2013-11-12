@@ -36,14 +36,19 @@ tensor2 Metric(Lvector p)
 }
 
 int cnt = 0;
+int maxcnt=10;
 
-start_data get_start()
+start_data *get_start()
 {
-  start_data sd;
+  start_data* sd;
   poskas pk(4);
   ioid id;
   char fname[10];
   
+  if (cnt >= maxcnt)
+    return NULL;
+  
+  sd = new start_data;
   
   id.open(cnt);
   
@@ -63,12 +68,12 @@ start_data get_start()
   pk.v[3] = v*K*sqrt((R-Rs)/R)/R;
 
   
-  sd.pk = pk;
-  sd.N = 1000;
-  sd.h = h1;
-  sd.dh = dh;
-  sd.id = id;
-  
+  sd->pk = pk;
+  sd->N = 1000;
+  sd->h = h1;
+  sd->dh = dh;
+  sd->id = id;
+  sd->p_id = cnt;
   cnt++;
   
   return sd;

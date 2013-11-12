@@ -121,6 +121,7 @@ struct start_data
   real dh;
   int N;
   ioid id;
+  int p_id;
 };
 
 
@@ -128,7 +129,7 @@ tensor2 dGi(Lvector p, int n);
 tensor3 Kristofel(Lvector p);
 tensor2 Metric(Lvector p);
 poskas runge_kutta4(poskas &pk, real h);
-start_data get_start();
+start_data* get_start();
 
 
 #define PRINT_LOG printf("%s (%s:%i)\n", __FUNCTION__, __FILE__, __LINE__);

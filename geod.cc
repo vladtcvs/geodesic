@@ -13,7 +13,7 @@ const real H=1e-5;
 
 
 
-poskas geodesic_step(poskas pos, real dh, real h1)
+inline poskas geodesic_step(poskas pos, real dh, real h1)
 {
     poskas pk=pos;
     real h = 0;
@@ -28,7 +28,7 @@ poskas geodesic_step(poskas pos, real dh, real h1)
 }
 
 
-poskas geodesic(poskas pos, real dh, real h1, int N, ioid id)
+inline poskas geodesic(poskas pos, real dh, real h1, int N, ioid id)
 {
   poskas pk = pos;
   real h = 0;
@@ -51,14 +51,16 @@ poskas geodesic(poskas pos, real dh, real h1, int N, ioid id)
 
 gpointer geodesic_glib(gpointer data)
 {
-  start_data *sd = (start_data*)data;
-  poskas pk = sd->pk;
-  real h1 = sd->h;
-  real dh = sd->dh;
-  int N = sd->N;
-  ioid id = sd->id;
-  geodesic(pk, dh, h1, N, id);
+  start_data *sd;
   
+  while (1)
+  {
+    sd = get_start();
+    if (sd == NULL)
+      break;
+    geodesic(sd->pk, sd->dh, sd->h, sd->N, sd->id);
+   
+  }
   return NULL;
 }
 
@@ -73,7 +75,7 @@ int main()
   
   start_data sd;
   
-  int nthr = 4;
+  int nthr = 2;
   pgthread *gth = new pgthread[nthr];
   
   
@@ -83,8 +85,7 @@ int main()
   {
     char tname[10];
     sprintf(tname, "thread%05i", i);
-    sd = get_start();
-    gth[i] = g_thread_new(tname, geodesic_glib, (gpointer)(&sd));
+    gth[i] = g_thread_new(tname, geodesic_glib, NULL);
     // ждем, чтобы поток успел скопировать данные
     sleep(1);
   }
