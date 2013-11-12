@@ -50,7 +50,7 @@ start_data *get_start()
   
   sd = new start_data;
   
-  id.open(cnt);
+  id.io_open(cnt, 4);
   
   
   real Rs = 1;
@@ -79,3 +79,7 @@ start_data *get_start()
   return sd;
 }
 
+void start_data::close()
+{
+  id.io_close();
+}

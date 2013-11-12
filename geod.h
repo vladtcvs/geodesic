@@ -4,6 +4,17 @@
 #include <stdlib.h>
 #include <vector>
 #include <stdio.h>
+#include <glib.h>
+
+
+#include <Qt/qobject.h>
+#include <Qt/QtNetwork>
+
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 
 typedef long double real;
@@ -104,10 +115,17 @@ class poskas
 
 class ioid
 {
-   FILE *out;
+   std::vector<double> msgbuf;
+   int udpSocket;
+   sockaddr_in s_addr;
+   
+   int calc_id;
    public:
-      void open(int ind);
-      void close();
+      ioid();
+      ~ioid();
+      void setlen(int l);
+      void io_open(int ind, int len);
+      void io_close();
       int write_poskas(poskas pk);
       
 };
@@ -122,6 +140,7 @@ struct start_data
   int N;
   ioid id;
   int p_id;
+  void close();
 };
 
 
@@ -130,9 +149,16 @@ tensor3 Kristofel(Lvector p);
 tensor2 Metric(Lvector p);
 poskas runge_kutta4(poskas &pk, real h);
 start_data* get_start();
-
+int io_init(int argc, char **argv);
+int io_close();
+void save_pos(poskas pk, int io_id);
+gpointer recv_server(gpointer data);
 
 #define PRINT_LOG printf("%s (%s:%i)\n", __FUNCTION__, __FILE__, __LINE__);
+
+
+
+#define GD_POSKAS 1
 
 
 #endif

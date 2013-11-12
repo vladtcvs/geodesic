@@ -18,6 +18,8 @@ tensor2 dGi(Lvector p, int n)
 
 	for (i = 0; i < 5; i++)
 	{
+		if (i == 2)
+		  continue;
 		Lvector dp = h * (i-2);
 		tensor2 metr = Metric(p + dp);
 		res += metr*(coef[i]);
