@@ -1,30 +1,44 @@
 #include <stdio.h>
 #include "geod.h"
+#include "ioid.h"
+#include "start.h"
+#ifdef LINUX
 #include <glib.h>
+#endif
 #include <string.h>
 #include <sys/types.h>
 #include <stdlib.h>
-#include <unistd.h>
 
-char server_ip[20]="127.0.0.1";
+char server_ip[20]="192.168.1.238";
 
 char my_ip[]="0.0.0.0";
 
 void ioid::io_open()
 {
   struct sockaddr_in addr;
-  udpSocket = socket(PF_INET, SOCK_DGRAM, 0);
-  bzero(&addr, sizeof(addr));
+  udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
+
+
+  memset(&addr, 0, sizeof(addr));
   addr.sin_family   = AF_INET;
   addr.sin_port     = htons(0);
+  
+  
+  memset(&srv_addr, 0, sizeof(srv_addr));
+  srv_addr.sin_family   = AF_INET;
+  srv_addr.sin_port     = htons(2345); 
+
+#ifdef LINUX
   inet_aton(my_ip, &addr.sin_addr);
+  inet_aton(server_ip, &srv_addr.sin_addr);
   bind(udpSocket, (struct sockaddr*)&addr, sizeof(addr));
-  
-  bzero(&s_addr, sizeof(s_addr));
-  s_addr.sin_family   = AF_INET;
-  s_addr.sin_port     = htons(2345); 
-  inet_aton(server_ip, &s_addr.sin_addr);
-  
+#elif WINDOWS
+  addr.sin_addr.s_addr = inet_addr(my_ip);
+  srv_addr.sin_addr.s_addr = inet_addr(server_ip);
+  bind(udpSocket, (LPSOCKADDR)&addr, sizeof(addr));
+#endif
+
+ 
   struct timeval timeout;      
   timeout.tv_sec = 5;
   timeout.tv_usec = 0;
@@ -34,13 +48,21 @@ void ioid::io_open()
 void ioid::getnew()
 {
   double msg[1] = {GD_GETNEW};
-  sendto(udpSocket, msg, sizeof(double), MSG_NOSIGNAL, (struct sockaddr*)&s_addr, sizeof(s_addr));
+#ifdef WINDOWS
+  sendto(udpSocket, (const char*)msg, sizeof(double), 0, (LPSOCKADDR)&srv_addr, sizeof(srv_addr));
+#elif LINUX
+  sendto(udpSocket, (const char*)msg, sizeof(double), 0, (sockaddr*)&srv_addr, sizeof(srv_addr));
+#endif
 }
 
 void ioid::io_close()
 {
   msgbuf.clear();
+#ifdef WINDOWS
+  closesocket(udpSocket);
+#elif LINUX
   close(udpSocket);
+#endif
 }
 
 ioid::ioid()
@@ -91,22 +113,23 @@ int ioid::write_poskas(poskas pk, int calc_id)
   }
   // здесь мы посылаем сообщение 
   double *data = msgbuf.data();
-  sendto(udpSocket, data, msgbuf.size()*sizeof(double), MSG_NOSIGNAL, (struct sockaddr*)&s_addr, sizeof(s_addr)); 
+  sendto(udpSocket, (const char*)data, msgbuf.size()*sizeof(double), 0, 
+	  (struct sockaddr*)&srv_addr, sizeof(srv_addr)); 
   return 0;
 }
 
 void ioid::fin()
 {
   double msg = GD_FIN;
-  sendto(udpSocket, &msg, sizeof(double), MSG_NOSIGNAL, (struct sockaddr*)&s_addr, sizeof(s_addr));
-  
+  sendto(udpSocket, (const char*)&msg, sizeof(double), 0, 
+	  (struct sockaddr*)&srv_addr, sizeof(srv_addr));  
 }
 
 int ioid::read_start(double *buf, int len)
 {
   int ans;
   
-  ans = recv(udpSocket, buf, len*sizeof(double), MSG_NOSIGNAL);
+  ans = recv(udpSocket, (char*)buf, len*sizeof(double), 0);
   PRINT_LOG
   return ans;
 }
@@ -127,12 +150,12 @@ int io_close()
 
 
 
-start_data *get_start()
+start_data *get_start(void)
 {
   start_data* sd;
   
   ioid id;
-  char fname[10];
+  
   double buf[1000];
   
   id.io_open();
@@ -140,14 +163,14 @@ start_data *get_start()
   if (id.read_start(buf, 1000) < 0)
     return NULL;
   
-  int msglen = buf[0];
+  int msglen = (int)buf[0];
   if (msglen == 0)
     return NULL;
   
   if (msglen < 13)
     return NULL;
   
-  int dim = buf[1];
+  int dim = (int)buf[1];
   
   poskas pk(dim);
   id.setlen(dim);
@@ -164,12 +187,12 @@ start_data *get_start()
   sd = new start_data;
   
   sd->pk = pk;
-  sd->N = buf[10];
+  sd->N = (int)buf[10];
   sd->h = buf[11];
   sd->dh = buf[12];
   sd->id = id;
   
-  sd->calc_id = buf[13];
+  sd->calc_id = (int)buf[13];
   
   
   return sd;
@@ -185,6 +208,7 @@ void save_pos(poskas pk, int calc_id)
   if (calc_id == -1)
   {
     int i, L = pk.p.dim();
+    printf("%i ", calc_id);
     for (i = 0; i < L; i++)
       printf("%lf ", (double)(pk.p[i]));
     printf("\n");
@@ -198,7 +222,7 @@ void save_pos(poskas pk, int calc_id)
  * Эта функция запускается на сервере. 
  * Она ожидает поступающих от клиентов результатов расчетов.
  */
-gpointer recv_server(gpointer data)
+void* recv_server(void* data)
 {
   int L = *((int*)data);
   int len = L*2+2;
@@ -210,12 +234,22 @@ gpointer recv_server(gpointer data)
   int calc_id;
   
   buf.resize(len);
-  
+#ifdef LINUX
   int udpSocket = socket(PF_INET, SOCK_DGRAM, 0);
+#elif WINDOWS
+  SOCKET udpSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+#endif
   sockaddr_in m_addr, c_addr;
   
-  bzero(&m_addr, sizeof(m_addr));
-  bzero(&c_addr, sizeof(c_addr));
+  if (udpSocket == -1)
+  {
+	printf("Failed to open socket\n");
+    return NULL;
+  }
+
+
+  memset(&m_addr, 0, sizeof(m_addr));
+  memset(&c_addr, 0, sizeof(c_addr));
 	  
 	  
   m_addr.sin_family   = AF_INET;  // обязательно AF_INET!
@@ -223,8 +257,16 @@ gpointer recv_server(gpointer data)
   
   
   /* Переводим адрес в нужный нам формат */
-  inet_aton(my_ip, &m_addr.sin_addr);
-  bind(udpSocket, (struct sockaddr*)&m_addr, sizeof(m_addr));
+  m_addr.sin_addr.s_addr = inet_addr(my_ip);
+#ifdef LINUX
+  int br = bind(udpSocket, (struct sockaddr*)&m_addr, sizeof(m_addr));
+#elif WINDOWS
+  int br = bind(udpSocket, (LPSOCKADDR)&m_addr, sizeof(m_addr));
+#endif
+  if (br < 0)
+  {
+	printf("Unable to bind socket\n");
+  }
   int go = 1;
   
   int dlen = -1;
@@ -233,26 +275,29 @@ gpointer recv_server(gpointer data)
 	  double *bdata = buf.data();
 	  int i;
 	  int msglen = buf.size()*sizeof(double);
-	
+#ifdef LINUX
 	  socklen_t frln;
-	  
-	  int bytesrecv = recvfrom(udpSocket, bdata, msglen, MSG_NOSIGNAL, (sockaddr*)&c_addr, &frln);
+#elif WINDOWS
+	  int frln;
+#endif
+	  frln = sizeof(c_addr);
+	  int bytesrecv = recvfrom(udpSocket, (char*)bdata, msglen, 0, (sockaddr*)&c_addr, &frln);
 	  
 	  if (bytesrecv == -1)
 	    break;
-	  Msgtype msg_type = (Msgtype)buf[0];
+	  Msgtype msg_type = (Msgtype)((int)buf[0]);
 	    
 	  switch(msg_type)
 	  {
 	    case GD_POSKAS:
 	      {
-		calc_id = buf[1];
-		for (i = 0; i < L; i++)
-		{
-		  pk.p[i] = buf[i+2];
-		  pk.v[i] = buf[i+L+2];
-		}
-		save_pos(pk, calc_id);
+			calc_id = (int)buf[1];
+			for (i = 0; i < L; i++)
+			{
+			  pk.p[i] = buf[i+2];
+			  pk.v[i] = buf[i+L+2];
+			}
+			save_pos(pk, calc_id);
 	      }
 	      break;
 	    case GD_GETNEW:
@@ -262,17 +307,18 @@ gpointer recv_server(gpointer data)
 		if (dlen == 0)
 		{
 		  double msg[2] = {0};
-		  sendto(udpSocket, &msg, sizeof(double), MSG_NOSIGNAL, (sockaddr*)&c_addr, frln);	
+		  sendto(udpSocket, (const char*)&msg, sizeof(double), 0, (sockaddr*)&c_addr, frln);	
 		  go = 0;
 		}  
 		else
 		{
 		  double *start = srv_get_start();
-		  dlen = start[0];
+		  dlen = (int)start[0];
 		  PRINT_LOG
 		  
 		  
-		  res = sendto(udpSocket, start, (dlen+1)*sizeof(double), MSG_NOSIGNAL, (sockaddr*)&c_addr, frln);
+		  res = sendto(udpSocket, (const char*)start, 
+				(dlen+1)*sizeof(double), 0, (sockaddr*)&c_addr, frln);
 		
 		  delete start;
 		}
@@ -280,17 +326,21 @@ gpointer recv_server(gpointer data)
 	      break;
 	    case GD_FIN:
 	      {
-		PRINT_LOG
-		printf("recv FIN from %s\n", inet_ntoa(c_addr.sin_addr));
+				PRINT_LOG
+				printf("recv FIN from %s\n", inet_ntoa(c_addr.sin_addr));
 	      }
 	      break;
 	    default:
 	      break;
 	  }
   }
-  
+#ifdef WINDOWS
+  closesocket(udpSocket);
+#elif LINUX
   close(udpSocket);
+#endif
   buf.clear();
+  return NULL;
 }
 
 

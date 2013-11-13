@@ -1,5 +1,5 @@
 #include "geod.h"
-
+#include "start.h"
 
 const real PI = 3.1415926535897932384626433832795;
 
@@ -40,7 +40,7 @@ tensor2 Metric(Lvector p)
 
 
 int cnt = 0;
-int maxcnt=10;
+int maxcnt=100;
 
 double *srv_get_start()
 {
