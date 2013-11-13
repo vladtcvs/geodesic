@@ -119,15 +119,16 @@ class ioid
    int udpSocket;
    sockaddr_in s_addr;
    
-   int calc_id;
    public:
       ioid();
       ~ioid();
       void setlen(int l);
-      void io_open(int ind, int len);
+      void io_open();
       void io_close();
-      int write_poskas(poskas pk);
-      
+      int write_poskas(poskas pk, int calc_id);
+      int read_start(double *buf, int len);
+      void fin();
+      void getnew();
 };
 
 
@@ -139,10 +140,9 @@ struct start_data
   real dh;
   int N;
   ioid id;
-  int p_id;
+  int calc_id;
   void close();
 };
-
 
 tensor2 dGi(Lvector p, int n);
 tensor3 Kristofel(Lvector p);
@@ -153,12 +153,17 @@ int io_init(int argc, char **argv);
 int io_close();
 void save_pos(poskas pk, int io_id);
 gpointer recv_server(gpointer data);
+double *srv_get_start();
 
+
+extern char server_ip[20];
+
+#ifdef DEBUG
 #define PRINT_LOG printf("%s (%s:%i)\n", __FUNCTION__, __FILE__, __LINE__);
+#else
+#define PRINT_LOG {;}
+#endif
 
-
-
-#define GD_POSKAS 1
-
+enum Msgtype {GD_POSKAS, GD_FIN, GD_GETNEW};
 
 #endif

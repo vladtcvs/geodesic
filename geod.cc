@@ -24,22 +24,22 @@ static inline poskas geodesic_step(poskas pos, real dh, real h1)
 }
 
 
-static inline poskas geodesic(poskas pos, real dh, real h1, int N, ioid id)
+static inline poskas geodesic(start_data *sd)
 {
-  poskas pk = pos;
+  poskas pk = sd->pk;
   real h = 0;
   int i = 0;
   int j;
   int d=pk.p.dim();
   
-  for (i = 0; i < N; i++)
+  for (i = 0; i < sd->N; i++)
   {
-    if (id.write_poskas(pk) == -1) 
+    if (sd->id.write_poskas(pk,sd->calc_id) == -1) 
       return pk;
-    pk=geodesic_step(pk,dh,h1/N);
+    pk=geodesic_step(pk,sd->dh,sd->h/sd->N);
   }
-  id.write_poskas(pk);
-  
+  sd->id.write_poskas(pk,sd->calc_id);
+  sd->id.fin();
   return pk;
 }
 
@@ -53,8 +53,10 @@ gpointer geodesic_glib(gpointer data)
   {
     sd = get_start();
     if (sd == NULL)
+    {
       break;
-    geodesic(sd->pk, sd->dh, sd->h, sd->N, sd->id);
+    }
+    geodesic(sd);
     sd->close();
   }
   return NULL;
@@ -69,12 +71,12 @@ int main(int argc, char **argv)
 {
   
   int i;
-  int server = 1;
+  int server = 0;
   
   if (argc > 1)
   {
-    if (strcmp(argv[1],"client")==0)
-      server = 0;
+    if (strcmp(argv[1],"server")==0)
+      server = 1;
   } 
   if (server)
   {
@@ -84,7 +86,7 @@ int main(int argc, char **argv)
   else
   {
     start_data sd;
-  
+    
     int numCPU = sysconf(_SC_NPROCESSORS_ONLN);
   
   
@@ -93,6 +95,11 @@ int main(int argc, char **argv)
   
     std::cout<<"Machine with "<<numCPU<<" CPU\n";
     std::cout<<"\n";
+    
+    if (argc > 1)
+      strcpy(server_ip, argv[1]);
+    
+    
     io_init(argc, argv);
  
     for (i = 0; i < nthr; i++)
@@ -101,7 +108,7 @@ int main(int argc, char **argv)
       sprintf(tname, "thread%05i", i);
       gth[i] = g_thread_new(tname, geodesic_glib, NULL);
       // ждем, чтобы поток успел скопировать данные
-      sleep(1);
+      usleep(100000);
     }
   
   

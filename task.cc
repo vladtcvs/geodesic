@@ -35,30 +35,33 @@ tensor2 Metric(Lvector p)
 	return res;
 }
 
+
+
+
+
 int cnt = 0;
 int maxcnt=10;
 
-start_data *get_start()
+double *srv_get_start()
 {
-  start_data* sd;
-  poskas pk(4);
-  ioid id;
-  char fname[10];
+  double *ans;
   
   if (cnt >= maxcnt)
-    return NULL;
+  {
+    ans = new double;
+    *ans = 0;
+    return ans;
+  }
   
-  sd = new start_data;
   
-  id.io_open(cnt, 4);
+  ans = new double[14];
+  poskas pk(4);
   
-  
-  real Rs = 1;
-  real R=(1.4999+cnt*0.0002)*Rs;
-  real h1=30;
-  real dh=1e-2;
-  real K = 1;
-  real v = 1;
+  double Rs = 1;
+  double R = 1.6*Rs;
+  double PI = 3.1415926535897932384626433832795;
+  double K = 1;
+  double v = 1;
   
   
   pk.p[0] = 0;
@@ -67,17 +70,28 @@ start_data *get_start()
   pk.v[0] = K;
   pk.v[3] = v*K*sqrt((R-Rs)/R)/R;
 
+  ans[0] = 13;
+  ans[1] = 4;
+  ans[2] = pk.p[0];
+  ans[3] = pk.p[1];
+  ans[4] = pk.p[2];
+  ans[5] = pk.p[3];
+  ans[6] = pk.v[0];
+  ans[7] = pk.v[1];
+  ans[8] = pk.v[2];
+  ans[9] = pk.v[3];
   
-  sd->pk = pk;
-  sd->N = 1000;
-  sd->h = h1;
-  sd->dh = dh;
-  sd->id = id;
-  sd->p_id = cnt;
+  ans[10] = 1000;  // N
+  ans[11] = 30;   // h1
+  ans[12] = 1e-2; // dh
+  
+  ans[13] = cnt;   // calc id
+  
   cnt++;
   
-  return sd;
+  return ans;
 }
+
 
 void start_data::close()
 {
