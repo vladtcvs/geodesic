@@ -321,7 +321,7 @@ void* recv_server(void* data)
 		  res = sendto(udpSocket, (const char*)start, 
 				(dlen+1)*sizeof(double), 0, (sockaddr*)&c_addr, frln);
 		
-		  delete start;
+		  delete[] start;
 		}
 	      }
 	      break;

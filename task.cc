@@ -48,7 +48,7 @@ double *srv_get_start()
   
   if (cnt >= maxcnt)
   {
-    ans = new double;
+    ans = new double[1];
     *ans = 0;
     return ans;
   }

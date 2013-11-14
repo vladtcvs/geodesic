@@ -6,9 +6,11 @@
 #include <stdio.h>
 
 
-//#define WINDOWS 1
-#define LINUX 1
-
+#define WINDOWS 1
+//#define LINUX 1
+#ifdef LINUX
+#undef WINDOWS
+#endif
 
 
 #ifdef WINDOWS
