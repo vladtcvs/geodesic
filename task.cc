@@ -40,7 +40,7 @@ tensor2 Metric(Lvector p)
 
 
 int cnt = 0;
-int maxcnt=100;
+int maxcnt=5;
 
 double *srv_get_start()
 {

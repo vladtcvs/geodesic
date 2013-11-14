@@ -234,6 +234,7 @@ void* recv_server(void* data)
   int calc_id;
   
   buf.resize(len);
+  PRINT_LOG
 #ifdef LINUX
   int udpSocket = socket(PF_INET, SOCK_DGRAM, 0);
 #elif WINDOWS
