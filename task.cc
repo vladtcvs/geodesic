@@ -1,6 +1,8 @@
 #include "geod.h"
 #include "start.h"
 
+#include "message.h"
+
 const real PI = 3.1415926535897932384626433832795;
 
 static real sqr(real x)
@@ -42,26 +44,27 @@ tensor2 Metric(Lvector p)
 int cnt = 0;
 int maxcnt=10;
 
-double *srv_get_start(int *calc_id)
+msg *srv_get_start()
 {
-  double *ans;
+  
   
   if (cnt >= maxcnt)
   {
-    ans = new double[1];
-    *ans = 0;
+    msg *ans;
+    ans = new msg;
+    
     return ans;
   }
+  msg_start *ans;
   
-  
-  ans = new double[14];
+  ans = new msg_start;
   poskas pk(4);
   
   double Rs = 1;
   double R = (1.49+cnt*0.01)*Rs;
   double PI = 3.1415926535897932384626433832795;
   double K = 1;
-  double v = 0.7;
+  double v = 0.99;
   
   
   pk.p[0] = 0;
@@ -70,23 +73,13 @@ double *srv_get_start(int *calc_id)
   pk.v[0] = K;
   pk.v[3] = v*K*sqrt((R-Rs)/R)/R;
 
-  ans[0] = 13;
-  ans[1] = 4;
-  ans[2] = pk.p[0];
-  ans[3] = pk.p[1];
-  ans[4] = pk.p[2];
-  ans[5] = pk.p[3];
-  ans[6] = pk.v[0];
-  ans[7] = pk.v[1];
-  ans[8] = pk.v[2];
-  ans[9] = pk.v[3];
   
-  ans[10] = 1000;  // N
-  ans[11] = 600;   // h1
-  ans[12] = 1e-1; // dh
-  
-  ans[13] = cnt;   // calc id
-  *calc_id = cnt;
+  ans->pk = pk;
+  ans->calc_id = cnt;
+  ans->N = 1000;
+  ans->h = 30;
+  ans->dh = 1e-2;
+  ans->dim = 4;
   cnt++;
   
   return ans;

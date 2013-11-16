@@ -29,10 +29,8 @@ class ioid
       void setlen(int l);
       void io_open();
       void io_close();
-      int write_poskas(poskas pk, int calc_id);
-      int read_start(double *buf, int len);
-      void fin(int calc_id);
-      void getnew();
+      int write(char *buf, int len);
+      int read(char *buf, int len);
 };
 
 
@@ -62,8 +60,8 @@ public:
    int srv_open();
    void srv_close();
    
-   int read(double *buf, int mlen, client_id *client);
-   int write(double *buf, int len, client_id *client);
+   int read(char *buf, int mlen, client_id *client);
+   int write(char *buf, int len, client_id *client);
 };
 
 

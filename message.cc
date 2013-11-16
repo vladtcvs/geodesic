@@ -8,10 +8,35 @@ Msgtype msg::mtype()
   return type;
 }
 
-void msg::stype(Msgtype mt)
+msg::msg()
 {
-  type = mt;
+  type = GD_NONE;
 }
+
+
+
+msg_poskas::msg_poskas()
+{
+  type = GD_POSKAS;
+}
+
+
+msg_start::msg_start()
+{
+  type = GD_START;
+}
+
+msg_fin::msg_fin()
+{
+  type = GD_FIN;
+}
+
+msg_getnew::msg_getnew()
+{
+  type = GD_GETNEW;
+}
+
+
 
 static double c2d_8(char *buf)
 {
@@ -83,8 +108,7 @@ msg* decode(char *buf, int blen)
     case GD_NONE:
       break;
     case GD_GETNEW:
-      ans = new msg;
-      ans->stype(GD_GETNEW);
+      ans = new msg_getnew;
       break;
     case GD_FIN:
       mf = new msg_fin;
@@ -131,6 +155,7 @@ msg* decode(char *buf, int blen)
       ind += 8;
       ms->dh = c2d_8(&(buf[ind]));
       ind += 8;
+      ans = ms;
       break;
   }
   return ans;
@@ -200,8 +225,10 @@ int encode(char *buf, int blen, msg *message)
       ind++;
       for (i = 0; i < L; i++)
       {
-	d2c_8(&(buf[ind]), mp->pk.p[i]);
-	d2c_8(&(buf[ind]), mp->pk.v[i]);
+	d2c_8(&(buf[ind]), (double)(mp->pk.p[i]));
+	ind+=8;
+	d2c_8(&(buf[ind]), (double)(mp->pk.v[i]));
+	ind+=8;
       }
       break;
     case GD_START:
@@ -209,7 +236,7 @@ int encode(char *buf, int blen, msg *message)
       L = ms->dim;
       if (blen < 2*8*L + 4+1)
 	return -1;
-      buf[ind] = GD_POSKAS;
+      buf[ind] = GD_START;
       ind++;
       i2c_4(&(buf[ind]), ms->calc_id);
       ind += 4;
@@ -223,7 +250,7 @@ int encode(char *buf, int blen, msg *message)
 	ind+=8;
       }
       i2c_4(&(buf[ind]), ms->N);
-      ind+=8;
+      ind+=4;
       d2c_8(&(buf[ind]), ms->h);
       ind+=8;
       d2c_8(&(buf[ind]), ms->dh);

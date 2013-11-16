@@ -50,15 +50,6 @@ void ioid::io_open()
   setsockopt (udpSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
 }
 
-void ioid::getnew()
-{
-  double msg[1] = {GD_GETNEW};
-#ifdef WINDOWS
-  sendto(udpSocket, (const char*)msg, sizeof(double), 0, (LPSOCKADDR)&srv_addr, sizeof(srv_addr));
-#elif LINUX
-  sendto(udpSocket, (const char*)msg, sizeof(double), 0, (sockaddr*)&srv_addr, sizeof(srv_addr));
-#endif
-}
 
 void ioid::io_close()
 {
@@ -93,48 +84,19 @@ void ioid::setlen(int l)
  * первое число - тип сообщения (msg_type), потом номер расчета (calc_id), 
  * дальше идут векторы позиции и касательной
  */
-int ioid::write_poskas(poskas pk, int calc_id)
+int ioid::write(char * buf, int len)
 {
-  int L = pk.p.dim();
-  int i;
-  int f = 1;
-  for (i = 0; f==1 && i < L; i++)
-  {
-    f *= (fabs(pk.p[i]) < 1e20);
-    f *= (fabs(pk.v[i]) < 1e20);
-  }
-  
-  if (f == 0)
-    return -1;
-  msgbuf[0] = GD_POSKAS;  
-  msgbuf[1] = calc_id;
-  for (i = 0; i < L; i++)
-  {
-    msgbuf[i+2] = pk.p[i];
-  }
-  for (i = 0; i < L; i++)
-  {
-    msgbuf[L+i+2] = pk.v[i];
-  }
-  // здесь мы посылаем сообщение 
-  double *data = msgbuf.data();
-  sendto(udpSocket, (const char*)data, msgbuf.size()*sizeof(double), 0, 
-	  (struct sockaddr*)&srv_addr, sizeof(srv_addr)); 
+  sendto(udpSocket, (const char*)buf, len, 0, (struct sockaddr*)&srv_addr, sizeof(srv_addr)); 
   return 0;
 }
 
-void ioid::fin(int calc_id)
-{
-  double msg[2] = {GD_FIN, calc_id};
-  sendto(udpSocket, (const char*)msg, 2*sizeof(double), 0, 
-	  (struct sockaddr*)&srv_addr, sizeof(srv_addr));  
-}
 
-int ioid::read_start(double *buf, int len)
+
+int ioid::read(char *buf, int len)
 {
   int ans;
   
-  ans = recv(udpSocket, (char*)buf, len*sizeof(double), 0);
+  ans = recv(udpSocket, buf, len, 0);
   PRINT_LOG
   return ans;
 }
@@ -198,7 +160,7 @@ void srv_ioid::srv_close()
 #endif
 }
 
-int srv_ioid::read(double *buf, int maxlen, client_id *client)
+int srv_ioid::read(char *buf, int maxlen, client_id *client)
 {
   
   int bytesrecv = -1;
@@ -207,15 +169,15 @@ int srv_ioid::read(double *buf, int maxlen, client_id *client)
   
   
   client->c_addr_l = sizeof(client->c_addr);
-  bytesrecv = recvfrom(udpSocket, buf, maxlen*sizeof(double), 0, (sockaddr*)&(client->c_addr), &(client->c_addr_l));
+  bytesrecv = recvfrom(udpSocket, buf, maxlen, 0, (sockaddr*)&(client->c_addr), &(client->c_addr_l));
  
   
   return bytesrecv;
 }
 
-int srv_ioid::write(double *buf, int len, client_id *client)
+int srv_ioid::write(char *buf, int len, client_id *client)
 {
-  return sendto(udpSocket, (const char*)buf, sizeof(double)*len, 0, (sockaddr*)&(client->c_addr), client->c_addr_l);
+  return sendto(udpSocket, (const char*)buf, len, 0, (sockaddr*)&(client->c_addr), client->c_addr_l);
 }
 
 

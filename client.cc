@@ -16,6 +16,17 @@ static inline poskas geodesic_step(poskas pos, real dh, real h1)
     return pk;
 }
 
+static int check_pk(poskas pk)
+{
+  int i, L = pk.p.dim();
+  int f = 1;
+  for (i = 0; f && i < L; i++)
+  {
+    f *= (fabs(pk.p[i]) < 1e20);
+    f *= (fabs(pk.v[i]) < 1e20);
+  }
+  return f;
+}
 
 static inline poskas geodesic(start_data *sd)
 {
@@ -25,17 +36,34 @@ static inline poskas geodesic(start_data *sd)
  
   int d=pk.p.dim();
   
+  msg_poskas *mess = new msg_poskas;
+  char buf[1000];
+  int len;
+  
+  mess->calc_id = sd->calc_id;
+  mess->dim = d;
+    
+  
   for (i = 0; i < sd->N; i++)
   {
-    if (sd->id.write_poskas(pk,sd->calc_id) == -1) 
-    {
-      sd->id.fin(sd->calc_id);
-      return pk;
-    }
+    mess->pk = pk;
+    len = encode(buf, 1000, mess);
+    if (sd->id.write(buf,len) == -1) 
+      break;
+    
     pk=geodesic_step(pk,sd->dh,sd->h/sd->N);
+    
+    if (check_pk(pk)==0)
+      break;
   }
-  sd->id.write_poskas(pk,sd->calc_id);
-  sd->id.fin(sd->calc_id);
+  
+  delete mess;
+  
+  msg_fin *mf = new msg_fin;
+  len = encode(buf, 1000, mf);
+  sd->id.write(buf,len);
+  delete mf;
+  
   return pk;
 }
 
@@ -49,44 +77,42 @@ start_data *get_start(void)
   
   ioid id;
   
-  double buf[1000];
+  char buf[1000];
   
   id.io_open();
-  id.getnew();
-  if (id.read_start(buf, 1000) < 0)
+  
+  msg *mg = new msg_getnew;
+ 
+  int len = encode(buf, 1000, mg);
+  
+  id.write(buf, len);
+  
+  int cnt = id.read(buf, 1000);
+  if (cnt < 0)
     return NULL;
   
-  int msglen = (int)buf[0];
-  if (msglen == 0)
+  msg *m = decode(buf, cnt);
+  
+  if (m->mtype() != GD_START)
     return NULL;
-  
-  if (msglen < 13)
-    return NULL;
-  
-  int dim = (int)buf[1];
-  
-  poskas pk(dim);
-  id.setlen(dim);
-  
-  pk.p[0] = buf[2];
-  pk.p[1] = buf[3];
-  pk.p[2] = buf[4];
-  pk.p[3] = buf[5];
-  pk.v[0] = buf[6];
-  pk.v[1] = buf[7];
-  pk.v[2] = buf[8];
-  pk.v[3] = buf[9];
-  
+  msg_start *mm = (msg_start*)m;
   sd = new start_data;
   
-  sd->pk = pk;
-  sd->N = (int)buf[10];
-  sd->h = buf[11];
-  sd->dh = buf[12];
+  sd->pk = mm->pk;
+  sd->N = mm->N;
+  sd->h = mm->h;
+  sd->dh = mm->dh;
   sd->id = id;
+  sd->calc_id = mm->calc_id;
   
-  sd->calc_id = (int)buf[13];
+  for (int i =0; i < sd->pk.p.dim(); i++)
+  {
+    printf("%lf ", (double)(sd->pk.v[i]));
+  }
+  printf("\n");
+  printf("N = %i h = %lf dh = %lf\n", sd->N, (double)(sd->h), (double)(sd->dh));
   
+  delete m;
   
   return sd;
 }
