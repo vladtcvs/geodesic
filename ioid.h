@@ -17,11 +17,10 @@ class ioid
    std::vector<double> msgbuf;
 #ifdef WINDOWS
    SOCKET udpSocket;
-
 #elif LINUX
-   int udpSocket;
-   
+   int udpSocket;   
 #endif
+   
    struct sockaddr_in srv_addr;
    
    public:
@@ -37,11 +36,45 @@ class ioid
 };
 
 
+struct client_id
+{
+  sockaddr_in c_addr;
+#ifdef LINUX
+  socklen_t c_addr_l;
+#elif WINDOWS
+  int c_addr_l;
+#endif
+  client_id();
+  char *client_name();
+};
+
+
+class srv_ioid
+{
+#ifdef WINDOWS
+   SOCKET udpSocket;
+#elif LINUX
+   int udpSocket;
+#endif
+public:
+   srv_ioid();
+   ~srv_ioid();
+   int srv_open();
+   void srv_close();
+   
+   int read(double *buf, int mlen, client_id *client);
+   int write(double *buf, int len, client_id *client);
+};
+
+
 int io_init(int argc, char **argv);
 int io_close();
 void save_pos(poskas pk, int io_id);
 
 void* recv_server(void* data);
-double *srv_get_start(int *calc_id);
+
+
+
+
 
 #endif

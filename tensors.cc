@@ -410,3 +410,14 @@ poskas poskas::operator /= (real n)
 }
 
 
+poskas::poskas()
+{
+	p.alloc(deflen);
+	v.alloc(deflen);
+}
+
+poskas::poskas(int l)
+{
+	p.alloc(l);
+	v.alloc(l);
+}
