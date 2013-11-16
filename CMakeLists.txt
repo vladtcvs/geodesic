@@ -10,9 +10,9 @@ install(TARGETS geodesic RUNTIME DESTINATION bin)
 
 
 
-include_directories(${CMAKE_SOURCE_DIR} /usr/include/glib-2.0 /usr/lib/x86_64-linux-gnu/glib-2.0/include/ /usr/include/qt4/Qt /usr/include/qt4)
+include_directories(${CMAKE_SOURCE_DIR} /usr/include/glib-2.0 /usr/lib/x86_64-linux-gnu/glib-2.0/include/)
 
-target_link_libraries(geodesic -lglib-2.0 -lQtNetwork -lQtCore)
+target_link_libraries(geodesic -lglib-2.0)
 
-set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -DDEBUG")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -DDEBUG -DLINUX")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -DLINUX")

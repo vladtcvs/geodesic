@@ -13,6 +13,9 @@ char server_ip[20]="192.168.1.238";
 
 char my_ip[]="0.0.0.0";
 
+
+
+
 void ioid::io_open()
 {
   struct sockaddr_in addr;
@@ -118,10 +121,10 @@ int ioid::write_poskas(poskas pk, int calc_id)
   return 0;
 }
 
-void ioid::fin()
+void ioid::fin(int calc_id)
 {
-  double msg = GD_FIN;
-  sendto(udpSocket, (const char*)&msg, sizeof(double), 0, 
+  double msg[2] = {GD_FIN, calc_id};
+  sendto(udpSocket, (const char*)msg, 2*sizeof(double), 0, 
 	  (struct sockaddr*)&srv_addr, sizeof(srv_addr));  
 }
 
@@ -144,6 +147,7 @@ int io_init(int argc, char **argv)
 
 int io_close()
 { 
+  
   return 0;
 }
 
@@ -199,21 +203,20 @@ start_data *get_start(void)
 }
 
 
+
 /**
  * Эта функция запускается только на сервере, она сохраняет принятые от клиентов 
  * данные 
  */
-void save_pos(poskas pk, int calc_id)
+void save_pos(FILE *outf, poskas pk, int calc_id)
 {
-  if (calc_id == -1)
-  {
     int i, L = pk.p.dim();
-    printf("%i ", calc_id);
+    PRINT_LOG
+    printf("id = %i L = %i", calc_id, L);
+    fprintf(outf, "%i ", calc_id);
     for (i = 0; i < L; i++)
-      printf("%lf ", (double)(pk.p[i]));
-    printf("\n");
-  }
-  
+      fprintf(outf, "%lf ", (double)(pk.p[i]));
+    fprintf(outf,"\n");
 }
 
 
@@ -233,6 +236,17 @@ void* recv_server(void* data)
   poskas pk;
   int calc_id;
   
+  int i;
+  
+  FILE *outf = fopen("out", "wt");
+  if (outf < 0)
+  {
+    PRINT_LOG
+    return NULL;
+  }
+  
+  //fprintf(outf, "Starting\n");
+  
   buf.resize(len);
   PRINT_LOG
 #ifdef LINUX
@@ -245,7 +259,7 @@ void* recv_server(void* data)
   if (udpSocket == -1)
   {
 	printf("Failed to open socket\n");
-    return NULL;
+	return NULL;
   }
 
 
@@ -298,7 +312,9 @@ void* recv_server(void* data)
 			  pk.p[i] = buf[i+2];
 			  pk.v[i] = buf[i+L+2];
 			}
-			save_pos(pk, calc_id);
+			PRINT_LOG
+			
+			save_pos(outf, pk, calc_id);
 	      }
 	      break;
 	    case GD_GETNEW:
@@ -309,11 +325,13 @@ void* recv_server(void* data)
 		{
 		  double msg[2] = {0};
 		  sendto(udpSocket, (const char*)&msg, sizeof(double), 0, (sockaddr*)&c_addr, frln);	
-		  go = 0;
+		 // go = 0;
 		}  
 		else
 		{
-		  double *start = srv_get_start();
+		  int calc_id;
+		  double *start = srv_get_start(&calc_id);
+		  
 		  dlen = (int)start[0];
 		  PRINT_LOG
 		  
@@ -328,18 +346,24 @@ void* recv_server(void* data)
 	    case GD_FIN:
 	      {
 				PRINT_LOG
-				printf("recv FIN from %s\n", inet_ntoa(c_addr.sin_addr));
+				printf("recv FIN from %s calc_id %i\n", inet_ntoa(c_addr.sin_addr), (int)buf[1]);
+ 				fflush(outf);
 	      }
 	      break;
 	    default:
 	      break;
 	  }
+	  
   }
+  
 #ifdef WINDOWS
   closesocket(udpSocket);
 #elif LINUX
   close(udpSocket);
 #endif
+  
+  
+  fclose(outf);
   buf.clear();
   return NULL;
 }

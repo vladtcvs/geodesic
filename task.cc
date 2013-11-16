@@ -40,9 +40,9 @@ tensor2 Metric(Lvector p)
 
 
 int cnt = 0;
-int maxcnt=5;
+int maxcnt=10;
 
-double *srv_get_start()
+double *srv_get_start(int *calc_id)
 {
   double *ans;
   
@@ -58,10 +58,10 @@ double *srv_get_start()
   poskas pk(4);
   
   double Rs = 1;
-  double R = 1.6*Rs;
+  double R = (1.49+cnt*0.01)*Rs;
   double PI = 3.1415926535897932384626433832795;
   double K = 1;
-  double v = 1;
+  double v = 0.7;
   
   
   pk.p[0] = 0;
@@ -82,11 +82,11 @@ double *srv_get_start()
   ans[9] = pk.v[3];
   
   ans[10] = 1000;  // N
-  ans[11] = 30;   // h1
-  ans[12] = 1e-2; // dh
+  ans[11] = 600;   // h1
+  ans[12] = 1e-1; // dh
   
   ans[13] = cnt;   // calc id
-  
+  *calc_id = cnt;
   cnt++;
   
   return ans;

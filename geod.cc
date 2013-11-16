@@ -40,11 +40,14 @@ static inline poskas geodesic(start_data *sd)
   for (i = 0; i < sd->N; i++)
   {
     if (sd->id.write_poskas(pk,sd->calc_id) == -1) 
+    {
+      sd->id.fin(sd->calc_id);
       return pk;
+    }
     pk=geodesic_step(pk,sd->dh,sd->h/sd->N);
   }
   sd->id.write_poskas(pk,sd->calc_id);
-  sd->id.fin();
+  sd->id.fin(sd->calc_id);
   return pk;
 }
 
@@ -62,8 +65,11 @@ DWORD WINAPI geodesic_winthreads( LPVOID lpParam )
     sd = get_start();
     if (sd == NULL)
     {
+      PRINT_LOG
       break;
     }
+    PRINT_LOG
+    
     geodesic(sd);
     sd->close();
   }
@@ -109,11 +115,11 @@ int main(int argc, char **argv)
   else
   {
     start_data sd;
-    int numCPU = 2;
+    int numCPU = 1;
     
     
 #ifdef LINUX
-    numCPU = sysconf(_SC_NPROCESSORS_ONLN);;
+    //numCPU = sysconf(_SC_NPROCESSORS_ONLN);;
 #endif
   
     int nthr = numCPU;

@@ -32,7 +32,7 @@ class ioid
       void io_close();
       int write_poskas(poskas pk, int calc_id);
       int read_start(double *buf, int len);
-      void fin();
+      void fin(int calc_id);
       void getnew();
 };
 
@@ -42,6 +42,6 @@ int io_close();
 void save_pos(poskas pk, int io_id);
 
 void* recv_server(void* data);
-double *srv_get_start();
+double *srv_get_start(int *calc_id);
 
 #endif

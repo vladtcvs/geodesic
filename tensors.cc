@@ -37,7 +37,10 @@ Lvector::~Lvector()
 real& Lvector::operator [] (int i)
 {
 	if (i >= L || i < 0)
+	{
+	  PRINT_LOG
 		throw 2;
+	}
 	return V[i];
 }
 
@@ -45,7 +48,10 @@ Lvector Lvector::operator + (Lvector &v)
 {
 	int i;
 	if (L != v.L)
+	{
+	  PRINT_LOG
 		throw 1;
+	}
 	Lvector res(L);
 	for (i = 0; i < L; i++)
 		res[i] = v.V[i] + V[i];
@@ -69,7 +75,10 @@ Lvector Lvector::operator += (Lvector &v)
 {
 	int i;
 	if (L != v.L)
+	{
+	  PRINT_LOG
 		throw 1;
+	}
 	for (i = 0; i < L; i++)
 		 V[i] += v.V[i];
 	return *this;
@@ -79,7 +88,10 @@ Lvector Lvector::operator -= (Lvector &v)
 {
 	int i;
 	if (L != v.L)
+	{
+	  PRINT_LOG
 		throw 1;
+	}
 	for (i = 0; i < L; i++)
 		 V[i] -= v.V[i];
 	return *this;
@@ -99,7 +111,10 @@ Lvector Lvector::operator / (real n)
 {
 
 	if (fabs(n) < eps)
+	{
+	  PRINT_LOG
 		throw 0;
+	}
 	Lvector res(L);
 	int i;
 	for (i = 0; i < L; i++)
@@ -123,7 +138,10 @@ Lvector Lvector::operator /= (real n)
 {
 	int i;
 	if (fabs(n) < eps)
+	{
+	        PRINT_LOG
 		throw 0;
+	}
 	for (i = 0; i < L; i++)
 		V[i] /= n;
 	return (*this);
@@ -135,7 +153,10 @@ tensor2 tensor2::operator / (real n)
 {
 	tensor2 res(L);
 	if (fabs(n) < eps)
+	{	
+		PRINT_LOG
 		throw 0;
+	}
 	int i;
 	for (i = 0; i < L; i++)
 		res[i] = m[i]/n;
@@ -146,7 +167,10 @@ tensor2 tensor2::operator / (real n)
 tensor2 tensor2::operator += (tensor2 t)
 {
 	if(L!=t.dim())
+	{
+	  PRINT_LOG
 		throw 1;
+	}
 	int i;
 	for (i = 0; i < L; i++)
 		m[i] += t.m[i];
@@ -194,9 +218,15 @@ real tensor2::det()
 	int c = 1;
 
 	if (L == 0)
+	{
+	  PRINT_LOG
 		throw 2;
+	}
 	if (L == 1)
+	{
+	  
 		return m[0][0];
+	}
 	if (L == 2)
 		return m[0][0]*m[1][1] - m[0][1]*m[1][0];
 
@@ -216,7 +246,10 @@ tensor2 tensor2::inv()
 {
 	real  d = det();
 	if (fabs(d)< eps)
+	{
+	  PRINT_LOG
 		throw 0;
+	}
 	tensor2 res(L);
 	int i, j;
 	for (i = 0; i < L; i++)
@@ -263,7 +296,10 @@ tensor2::~tensor2()
 Lvector& tensor2::operator [] (int i)
 {
 	if (i < 0 || i >= L)
+	{
+	  PRINT_LOG
 		throw 2;
+	}
 	return m[i];
 }
 
@@ -304,7 +340,10 @@ tensor3::~tensor3()
 tensor2& tensor3::operator [] (int i)
 {
 	if (i < 0 || i >= L)
+	{
+	  PRINT_LOG
 		throw 2;
+	}
 	return m[i];
 }
 
