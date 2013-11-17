@@ -103,6 +103,15 @@ void* recv_server(void* data)
 		  
 		  delete start;
 		}
+		else
+		{
+		  msg_signal *mm = new msg_signal;
+		  mm->sig = GD_S_END;
+		  char mess[1000];
+		  dlen = encode(mess, 1000, mm);
+		  io.write(mess, dlen, &cl);
+		  delete mm;
+		}
 	      }
 	      break;
 	    case GD_FIN:

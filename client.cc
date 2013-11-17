@@ -87,13 +87,21 @@ start_data *get_start(void)
   
   id.write(buf, len);
   
-  int cnt = id.read(buf, 1000);
-  if (cnt < 0)
-    return NULL;
+  int cnt;
   
-  msg *m = decode(buf, cnt);
+  msg *m; 
+  do
+  {
+    cnt = id.read(buf, 1000);
+    if (cnt < 0)
+      return NULL;
   
-  if (m->mtype() != GD_START)
+    m = decode(buf, cnt);
+  }
+  while (m->mtype()  == GD_SIGNAL && ((msg_signal*)m)->sig==GD_S_WAIT);
+    
+  
+  if (m->mtype() != GD_START)   
     return NULL;
   msg_start *mm = (msg_start*)m;
   sd = new start_data;

@@ -98,6 +98,7 @@ msg* decode(char *buf, int blen)
   msg_fin *mf = NULL;
   msg_poskas *mp = NULL;
   msg_start *ms = NULL;
+  msg_signal *mss = NULL;
   if (blen < 1)
     return NULL;
   
@@ -109,6 +110,12 @@ msg* decode(char *buf, int blen)
       break;
     case GD_GETNEW:
       ans = new msg_getnew;
+      break;
+    case GD_SIGNAL:
+      mss = new msg_signal;
+      mss->sig = (Sigtype)buf[ind];
+      ind++;
+      ans = mss;
       break;
     case GD_FIN:
       mf = new msg_fin;
@@ -204,6 +211,12 @@ int encode(char *buf, int blen, msg *message)
       buf[ind] = GD_GETNEW;
       ind++;
       break;
+    case GD_SIGNAL:
+      buf[ind] = GD_SIGNAL;
+      ind++;
+      buf[ind] = ((msg_signal*)message)->sig;
+      ind++;
+      break;
     case GD_FIN:
       if (blen < 5)
 	return -1;
@@ -261,4 +274,10 @@ int encode(char *buf, int blen, msg *message)
       break;
   }
   return ind;
+}
+
+msg_signal::msg_signal()
+{
+  type = GD_SIGNAL;
+  sig = GD_S_NONE;
 }

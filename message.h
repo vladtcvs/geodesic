@@ -3,7 +3,8 @@
 
 #include "tensor.h"
 
-enum Msgtype {GD_NONE, GD_POSKAS, GD_FIN, GD_GETNEW, GD_START};
+enum Msgtype {GD_NONE, GD_POSKAS, GD_FIN, GD_GETNEW, GD_START, GD_SIGNAL};
+enum Sigtype {GD_S_NONE, GD_S_WAIT, GD_S_END};
 class msg
 {
 protected:
@@ -46,6 +47,14 @@ class msg_getnew : public msg
 {
 public:
   msg_getnew();
+};
+
+class msg_signal : public msg
+{
+  
+public:
+  Sigtype sig;
+  msg_signal();
 };
 
 msg* decode(char *buf, int blen);
