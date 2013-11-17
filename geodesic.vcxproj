@@ -69,9 +69,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="client.cc" />
     <ClCompile Include="geod.cc" />
     <ClCompile Include="io.cc" />
+    <ClCompile Include="light_source.cc" />
+    <ClCompile Include="message.cc" />
     <ClCompile Include="runge.cc" />
+    <ClCompile Include="server.cc" />
     <ClCompile Include="space.cc" />
     <ClCompile Include="task.cc" />
     <ClCompile Include="tensors.cc" />
@@ -79,7 +83,10 @@
   <ItemGroup>
     <ClInclude Include="geod.h" />
     <ClInclude Include="ioid.h" />
+    <ClInclude Include="message.h" />
     <ClInclude Include="start.h" />
+    <ClInclude Include="task.h" />
+    <ClInclude Include="tensor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

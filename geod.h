@@ -7,7 +7,7 @@
 
 #define WINDOWS 1
 
-#define LINUX 1
+//#define LINUX 1
 
 
 #ifdef LINUX

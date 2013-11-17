@@ -42,9 +42,18 @@ void* recv_server(void* data)
   poskas pk;
   int calc_id;
   
-  int i;
-  
+//  int i;
+#ifdef LINUX  
   FILE *outf = fopen("out", "wt");
+#elif WINDOWS
+  FILE *outf = NULL;
+  errno_t errnum;
+  if (errnum = fopen_s(&outf, "out", "wt") < 0)
+  {
+	  printf_s("error %i\n", errnum);
+	  return NULL;
+  }
+#endif
   if (outf < 0)
   {
     PRINT_LOG
@@ -61,7 +70,7 @@ void* recv_server(void* data)
   int dlen = -1;
   while (go)
   {
-	  int i;
+//	  int i;
 	  
 	  
 	  int bytesrecv = io.read(buf, 1000, &cl);
@@ -89,7 +98,7 @@ void* recv_server(void* data)
 	      {
 		printf("recv GETNEW from %s\n", cl.client_name());
 		
-		int res;
+		//int res;
 		msg *start = srv_get_start();
 		if (start->mtype()==GD_START)
 		{		 

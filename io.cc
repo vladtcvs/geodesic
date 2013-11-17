@@ -164,8 +164,7 @@ int srv_ioid::read(char *buf, int maxlen, client_id *client)
 {
   
   int bytesrecv = -1;
-  msghdr msg;
-  iovec  iov[1];
+ 
   
   
   client->c_addr_l = sizeof(client->c_addr);

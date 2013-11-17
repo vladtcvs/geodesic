@@ -52,7 +52,12 @@ int main(int argc, char **argv)
     
     
 #ifdef LINUX
-    //numCPU = sysconf(_SC_NPROCESSORS_ONLN);;
+    numCPU = sysconf(_SC_NPROCESSORS_ONLN);;
+#elif WINDOWS
+	SYSTEM_INFO sysinfo;
+	GetSystemInfo( &sysinfo );
+
+	numCPU = sysinfo.dwNumberOfProcessors;
 #endif
   
     int nthr = numCPU;
