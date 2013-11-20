@@ -2,6 +2,7 @@
 #define MESSAGE_H
 
 #include "tensor.h"
+#include "start.h"
 
 enum Msgtype {GD_NONE, GD_POSKAS, GD_FIN, GD_GETNEW, GD_START, GD_SIGNAL};
 enum Sigtype {GD_S_NONE, GD_S_WAIT, GD_S_END};
@@ -11,6 +12,9 @@ protected:
   Msgtype type;
   
 public:
+#ifdef LINUX
+  pthread_t thread;
+#endif
   Msgtype mtype();
   msg();
 };
@@ -59,6 +63,7 @@ public:
 
 msg* decode(char *buf, int blen);
 int encode(char *buf, int blen, msg *message);
-
+start_data *msg2start(msg_start *ms, ioid& id);
+msg_start *start2msg(start_data *ms);
 
 #endif

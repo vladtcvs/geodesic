@@ -1,11 +1,17 @@
 #include "geod.h"
 
 #include "ioid.h"
-
+#include <iostream>
 
 #include <string.h>
 #include "message.h"
 #include "task.h"
+
+#include <list>
+
+#include <time.h>
+#include "server.h"
+
 
 /**
  * Эта функция запускается только на сервере, она сохраняет принятые от клиентов 
@@ -24,6 +30,18 @@ static void save_pos(FILE *outf, poskas pk, int calc_id)
 }
 
 
+sd_stel::sd_stel()
+{
+  ready = time(NULL);
+  data = NULL;
+}
+
+sd_stel::sd_stel(start_data* d)
+{
+  ready = time(NULL);
+  data = d;
+}
+
 
 
 /** 
@@ -35,6 +53,10 @@ void* recv_server(void* data)
   int L = *((int*)data);
   int len = L*2+2;
   char buf[1000];
+  
+  
+  std::list<sd_stel> sval;
+  
   
   srv_ioid io;
   client_id cl;
@@ -88,34 +110,47 @@ void* recv_server(void* data)
 			msg_poskas *pos = (msg_poskas*)rec;
 			calc_id = pos->calc_id;
 			pk=pos->pk;
+			std::list<sd_stel>::iterator it;
 			
-			PRINT_LOG
 			
 			save_pos(outf, pk, calc_id);
+			PRINT_LOG
+			
+			
 	      }
 	      break;
 	    case GD_GETNEW:
 	      {
-		printf("recv GETNEW from %s\n", cl.client_name());
+		std::cout<<"recv GETNEW from "<<cl.client_name()<<" tid = "<<rec->thread;
 		
+		
+		std::list<sd_stel>::iterator it;
+				
 		//int res;
-		msg *start = srv_get_start();
-		if (start->mtype()==GD_START)
+		start_data *start;
+		{
+		  start = srv_get_start();
+		  if (start != NULL)
+		    sval.push_back(sd_stel(start));
+		}
+		if (start != NULL)
 		{		 
 		  char mess[1000];
-		 
-		  
-		  dlen = encode(mess, 1000, start);
+		  msg_start *ms = start2msg(start);
+		  ms->thread = rec->thread;
+		  dlen = encode(mess, 1000, ms);
 		  PRINT_LOG
 		  
 		  io.write(mess, dlen, &cl);
+		  std::cout<<" calc_id = "<<start->calc_id<<"\n";
 		  
-		  delete start;
 		}
 		else
 		{
+		  printf("\n");
 		  msg_signal *mm = new msg_signal;
 		  mm->sig = GD_S_END;
+		  mm->thread = rec->thread;
 		  char mess[1000];
 		  dlen = encode(mess, 1000, mm);
 		  io.write(mess, dlen, &cl);
@@ -125,9 +160,11 @@ void* recv_server(void* data)
 	      break;
 	    case GD_FIN:
 	      {
-			PRINT_LOG
-			printf("recv FIN from %s calc_id %i\n", cl.client_name(), ((msg_fin*)rec)->calc_id);
+		msg_fin *mf = (msg_fin*)rec;
+		PRINT_LOG
+		std::cout<<"recv FIN from "<<cl.client_name()<<" tid = "<<mf->thread<<" calc id= "<<mf->calc_id<<"\n";
  			
+			
 	      }
 	      break;
 	    default:

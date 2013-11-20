@@ -2,9 +2,7 @@
 #include "geod.h"
 #include "ioid.h"
 #include "start.h"
-#ifdef LINUX
-#include <glib.h>
-#endif
+
 #include <string.h>
 #include <sys/types.h>
 #include <stdlib.h>

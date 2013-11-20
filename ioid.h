@@ -17,8 +17,10 @@ class ioid
    std::vector<double> msgbuf;
 #ifdef WINDOWS
    SOCKET udpSocket;
+   int tid;
 #elif LINUX
    int udpSocket;   
+   pid_t tid;
 #endif
    
    struct sockaddr_in srv_addr;

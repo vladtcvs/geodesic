@@ -2,6 +2,7 @@
 #include "message.h"
 
 #include <string.h>
+#include "start.h"
 
 Msgtype msg::mtype()
 {
@@ -10,6 +11,7 @@ Msgtype msg::mtype()
 
 msg::msg()
 {
+  thread = 0;
   type = GD_NONE;
 }
 
@@ -63,6 +65,51 @@ void d2c_8(char *buf, double a)
 }
 
 
+/*msg_start 2 start_data
+ * */
+start_data *msg2start(msg_start *ms, ioid& id)
+{
+  start_data *res = new start_data;
+  
+  
+  res->calc_id = ms->calc_id;
+  res->dh = ms->dh;
+  res->h = ms->h;
+  res->N = ms->N;
+  res->pk = ms->pk;
+  res->id = id;
+  
+  return res;
+}
+
+
+
+/* start_data 2 msg_start
+ * */
+msg_start *start2msg(start_data *ms)
+{
+  msg_start *res = new msg_start;
+  
+  res->calc_id = ms->calc_id;
+  res->dh = ms->dh;
+  res->h = ms->h;
+  res->N = ms->N;
+  res->pk = ms->pk;
+  res->dim = ms->pk.p.dim();
+  return res;
+}
+
+
+int sethdr(char *buf, msg *ms)
+{
+  buf[0] = ms->mtype();
+  pthread_t tid = ms->thread;
+  memcpy(&(buf[1]), &tid, sizeof(pthread_t));
+  return 1+sizeof(pthread_t);
+}
+
+
+
 /* 
  * GETNEW: 	type 	1 byte
  * 		
@@ -101,10 +148,14 @@ msg* decode(char *buf, int blen)
   msg_signal *mss = NULL;
   if (blen < 1)
     return NULL;
+  ind = 0;
+  Msgtype mt = (Msgtype)buf[ind];  
+  ind++; 
+  pthread_t tid = 0;
+  memcpy(&tid, &(buf[ind]), sizeof(pthread_t));
+  ind+=sizeof(pthread_t);
   
-  ind = 1;
-  
-  switch (buf[0])
+  switch (mt)
   {
     case GD_NONE:
       break;
@@ -165,6 +216,7 @@ msg* decode(char *buf, int blen)
       ans = ms;
       break;
   }
+  ans->thread = tid;
   return ans;
 }
 
@@ -205,33 +257,28 @@ int encode(char *buf, int blen, msg *message)
   if (blen < 1)
     return -1;
   int ind = 0;
+  
+  //printf("Tid = %u\n", (unsigned int)(message->thread));
+  
   switch(message->mtype())
   {
     case GD_GETNEW:
-      buf[ind] = GD_GETNEW;
-      ind++;
+      ind = sethdr(buf, message);
       break;
     case GD_SIGNAL:
-      buf[ind] = GD_SIGNAL;
-      ind++;
-      buf[ind] = ((msg_signal*)message)->sig;
-      ind++;
+      ind = sethdr(buf, message);
+      buf[ind++] = ((msg_signal*)message)->sig;
       break;
     case GD_FIN:
-      if (blen < 5)
-	return -1;
       mf = (msg_fin*)message;
-      buf[ind] = GD_FIN;
-      ind++;
+      ind = sethdr(buf, message);
       i2c_4(&(buf[ind]), mf->calc_id);
+      ind+=4;
       break;
     case GD_POSKAS:
       mp = (msg_poskas*)message;
       L = mp->dim;
-      if (blen < 2*8*L + 4+1)
-	return -1;
-      buf[ind] = GD_POSKAS;
-      ind++;
+      ind = sethdr(buf,message);
       i2c_4(&(buf[ind]), mp->calc_id);
       ind += 4;
       buf[ind] = mp->dim;
@@ -247,10 +294,7 @@ int encode(char *buf, int blen, msg *message)
     case GD_START:
       ms = (msg_start*)message;
       L = ms->dim;
-      if (blen < 2*8*L + 4+1)
-	return -1;
-      buf[ind] = GD_START;
-      ind++;
+      ind = sethdr(buf, message);
       i2c_4(&(buf[ind]), ms->calc_id);
       ind += 4;
       buf[ind] = ms->dim;

@@ -2,6 +2,6 @@
 #define TASK_H
 
 #include "message.h"
-msg *srv_get_start();
+start_data *srv_get_start();
 
 #endif

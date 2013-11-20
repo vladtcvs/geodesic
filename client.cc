@@ -2,6 +2,12 @@
 #include "start.h"
 #include "message.h"
 
+#include <iostream>
+
+#ifdef LINUX
+#include <pthread.h>
+#endif
+
 static inline poskas geodesic_step(poskas pos, real dh, real h1)
 {
     poskas pk=pos;
@@ -59,10 +65,6 @@ static inline poskas geodesic(start_data *sd)
   
   delete mess;
   
-  msg_fin *mf = new msg_fin;
-  len = encode(buf, 1000, mf);
-  sd->id.write(buf,len);
-  delete mf;
   
   return pk;
 }
@@ -71,7 +73,7 @@ static inline poskas geodesic(start_data *sd)
 
 
 
-start_data *get_start(void)
+start_data *get_start(pthread_t tid)
 {
   start_data* sd;
   
@@ -83,6 +85,10 @@ start_data *get_start(void)
   
   msg *mg = new msg_getnew;
  
+  mg->thread = tid;
+  
+  std::cout<<"My tid = "<<tid<<"\n";
+  
   int len = encode(buf, 1000, mg);
   
   id.write(buf, len);
@@ -103,22 +109,23 @@ start_data *get_start(void)
   
   if (m->mtype() != GD_START)   
     return NULL;
-  msg_start *mm = (msg_start*)m;
-  sd = new start_data;
   
-  sd->pk = mm->pk;
-  sd->N = mm->N;
-  sd->h = mm->h;
-  sd->dh = mm->dh;
-  sd->id = id;
-  sd->calc_id = mm->calc_id;
+  if (m->thread - tid != 0)
+  {
+    std::cout<<"Wrong thread"<<m->thread<<"! \n";
+    return NULL;
+  }
+  
+  msg_start *mm = (msg_start*)m;
+  sd = msg2start(mm, id);
+  
   
   for (int i =0; i < sd->pk.p.dim(); i++)
   {
-    printf("%lf ", (double)(sd->pk.v[i]));
+    printf("%lf ", (double)(sd->pk.p[i]));
   }
   printf("\n");
-  printf("N = %i h = %lf dh = %lf\n", sd->N, (double)(sd->h), (double)(sd->dh));
+  printf("N = %i h = %lf dh = %lf  ID = %i\n", sd->N, (double)(sd->h), (double)(sd->dh), sd->calc_id);
   
   delete m;
   
@@ -127,16 +134,22 @@ start_data *get_start(void)
 
 
 #ifdef LINUX
-gpointer geodesic_glib(gpointer data)
+void* geodesic_pthread(void* data)
 #elif WINDOWS
 DWORD WINAPI geodesic_winthreads( LPVOID data )
 #endif
 {
   start_data *sd;
+#ifdef LINUX
+  pthread_t tid;
+
+  tid = pthread_self();
+  
+#endif
   
   while (1)
   {
-    sd = get_start();
+    sd = get_start(tid);
     if (sd == NULL)
     {
       PRINT_LOG
@@ -145,6 +158,16 @@ DWORD WINAPI geodesic_winthreads( LPVOID data )
     PRINT_LOG
     
     geodesic(sd);
+    msg_fin *mf = new msg_fin;
+    mf->calc_id = sd->calc_id;
+    mf->thread = tid;
+    char buf[1000];
+    printf("FIN: calc_id = %i\n", mf->calc_id);
+    int len = encode(buf, 1000, mf);
+    sd->id.write(buf,len);
+    delete mf;
+  
+    
     sd->close();
   }
 #ifdef LINUX

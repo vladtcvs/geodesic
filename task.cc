@@ -42,22 +42,22 @@ tensor2 Metric(Lvector p)
 
 
 int cnt = 0;
-int maxcnt=100;
+int maxcnt=10;
 
-msg *srv_get_start()
+start_data *srv_get_start()
 {
   
   
   if (cnt >= maxcnt)
   {
-    msg *ans;
-    ans = new msg;
+    start_data *ans = NULL;
+    
     
     return ans;
   }
-  msg_start *ans;
+  start_data *ans;
   
-  ans = new msg_start;
+  ans = new start_data;
   poskas pk(4);
   
   double Rs = 1;
@@ -79,7 +79,7 @@ msg *srv_get_start()
   ans->N = 1000;
   ans->h = 30;
   ans->dh = 1e-2;
-  ans->dim = 4;
+  
   cnt++;
   
   return ans;

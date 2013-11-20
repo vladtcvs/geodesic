@@ -7,7 +7,7 @@
 
 #define WINDOWS 1
 
-//#define LINUX 1
+#define LINUX 1
 
 
 #ifdef LINUX
@@ -17,8 +17,6 @@
 
 #ifdef WINDOWS
 #include <Windows.h>
-#elif LINUX
-#include <glib.h>
 #endif
 
 #include "tensor.h"
@@ -47,7 +45,8 @@ extern char server_ip[20];
 extern char my_ip[20];
 
 #ifdef LINUX
-gpointer geodesic_glib(gpointer data);
+
+void* geodesic_pthread(void* data);
 #elif WINDOWS
 DWORD WINAPI geodesic_winthreads( LPVOID data );
 #endif

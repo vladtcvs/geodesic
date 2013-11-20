@@ -3,7 +3,7 @@
 #include "start.h"
 
 #ifdef LINUX
-#include <glib.h>
+#include <pthread.h>
 #endif
 
 #include <iostream>
@@ -14,10 +14,6 @@ const real eps=1e-7;
 const real H=1e-5;
 
 
-
-#ifdef LINUX
-typedef GThread * pgthread;
-#endif
 
 int main(int argc, char **argv)
 {
@@ -48,9 +44,9 @@ int main(int argc, char **argv)
   else
   {
     start_data sd;
-    int numCPU = 1;
+    int numCPU = 2;
     
-    
+    /*
 #ifdef LINUX
     numCPU = sysconf(_SC_NPROCESSORS_ONLN);;
 #elif WINDOWS
@@ -59,10 +55,10 @@ int main(int argc, char **argv)
 
 	numCPU = sysinfo.dwNumberOfProcessors;
 #endif
-  
+  */
     int nthr = numCPU;
 #ifdef LINUX
-    pgthread *gth = new pgthread[nthr];
+    pthread_t* pth = new pthread_t[nthr];
 #elif WINDOWS
 	HANDLE *gth = new HANDLE[nthr];
 	DWORD *tid = new DWORD[nthr];
@@ -93,7 +89,7 @@ int main(int argc, char **argv)
 	  char tname[100];
       sprintf(tname, "thread%05i", i);
       
-	  gth[i] = g_thread_new(tname, geodesic_glib, NULL);
+	  int res = pthread_create(&(pth[i]), NULL, geodesic_pthread, NULL);
 	  // ждем, чтобы поток успел скопировать данные
 	  usleep(100000);
 #endif
@@ -107,12 +103,12 @@ int main(int argc, char **argv)
         CloseHandle(gth[i]);
 #elif LINUX
     for (i = 0; i < nthr; i++)
-      g_thread_join(gth[i]);
+      pthread_join(pth[i], NULL);
 #endif  
   
     io_close();
   
-    delete gth;
+    delete[] pth;
   }
   return 0;
 }
