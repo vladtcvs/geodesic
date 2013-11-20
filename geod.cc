@@ -46,7 +46,7 @@ int main(int argc, char **argv)
     start_data sd;
     int numCPU = 2;
     
-    /*
+    
 #ifdef LINUX
     numCPU = sysconf(_SC_NPROCESSORS_ONLN);;
 #elif WINDOWS
@@ -55,12 +55,12 @@ int main(int argc, char **argv)
 
 	numCPU = sysinfo.dwNumberOfProcessors;
 #endif
-  */
+  
     int nthr = numCPU;
 #ifdef LINUX
     pthread_t* pth = new pthread_t[nthr];
 #elif WINDOWS
-	HANDLE *gth = new HANDLE[nthr];
+	HANDLE *pth = new HANDLE[nthr];
 	DWORD *tid = new DWORD[nthr];
 #endif
 
@@ -82,13 +82,11 @@ int main(int argc, char **argv)
     {
       
 #ifdef WINDOWS
-	  gth[i] = CreateThread(NULL, 0, geodesic_winthreads, NULL, 0, &(tid[i]));
+	  pth[i] = CreateThread(NULL, 0, geodesic_winthreads, NULL, 0, &(tid[i]));
 	  // ждем, чтобы поток успел скопировать данные
 	  Sleep(100);
 #elif LINUX
-	  char tname[100];
-      sprintf(tname, "thread%05i", i);
-      
+	  
 	  int res = pthread_create(&(pth[i]), NULL, geodesic_pthread, NULL);
 	  // ждем, чтобы поток успел скопировать данные
 	  usleep(100000);
@@ -98,9 +96,9 @@ int main(int argc, char **argv)
 	   // ждем окончания всех потоков
  
 #ifdef WINDOWS
-    WaitForMultipleObjects(nthr, gth, TRUE, INFINITE);
+    WaitForMultipleObjects(nthr, pth, TRUE, INFINITE);
 	for(int i=0; i < nthr; i++)
-        CloseHandle(gth[i]);
+        CloseHandle(pth[i]);
 #elif LINUX
     for (i = 0; i < nthr; i++)
       pthread_join(pth[i], NULL);
