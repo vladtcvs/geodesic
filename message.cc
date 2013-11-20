@@ -104,8 +104,8 @@ int sethdr(char *buf, msg *ms)
 {
   buf[0] = ms->mtype();
   pthread_t tid = ms->thread;
-  memcpy(&(buf[1]), &tid, sizeof(pthread_t));
-  return 1+sizeof(pthread_t);
+  memcpy(&(buf[1]), &tid, sizeof(int64_t));
+  return 1+sizeof(int64_t);
 }
 
 
@@ -152,8 +152,8 @@ msg* decode(char *buf, int blen)
   Msgtype mt = (Msgtype)buf[ind];  
   ind++; 
   pthread_t tid = 0;
-  memcpy(&tid, &(buf[ind]), sizeof(pthread_t));
-  ind+=sizeof(pthread_t);
+  memcpy(&tid, &(buf[ind]), sizeof(int64_t));
+  ind+=sizeof(int64_t);
   
   switch (mt)
   {

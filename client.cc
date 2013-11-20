@@ -73,7 +73,7 @@ static inline poskas geodesic(start_data *sd)
 
 
 
-start_data *get_start(pthread_t tid)
+start_data *get_start(int64_t tid)
 {
   start_data* sd;
   
@@ -140,11 +140,11 @@ DWORD WINAPI geodesic_winthreads( LPVOID data )
 #endif
 {
   start_data *sd;
+  int64_t tid;
 #ifdef LINUX
-  pthread_t tid;
-
   tid = pthread_self();
-  
+#elif WINDOWS
+  tid = GetCurrentThreadId(void);
 #endif
   
   while (1)

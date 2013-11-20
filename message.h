@@ -13,7 +13,9 @@ protected:
   
 public:
 #ifdef LINUX
-  pthread_t thread;
+  int64_t thread;
+#elif WINDOWS
+  
 #endif
   Msgtype mtype();
   msg();
