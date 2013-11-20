@@ -7,8 +7,7 @@
 
 #define WINDOWS 1
 
-#define LINUX 1
-
+//#define LINUX 1
 
 #ifdef LINUX
 #undef WINDOWS
@@ -17,6 +16,7 @@
 
 #ifdef WINDOWS
 #include <Windows.h>
+#include <stdint.h>
 #endif
 
 #include "tensor.h"

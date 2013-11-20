@@ -84,6 +84,7 @@
     <ClInclude Include="geod.h" />
     <ClInclude Include="ioid.h" />
     <ClInclude Include="message.h" />
+    <ClInclude Include="server.h" />
     <ClInclude Include="start.h" />
     <ClInclude Include="task.h" />
     <ClInclude Include="tensor.h" />

@@ -6,7 +6,7 @@
 struct sd_stel
 {
   start_data *data;
-  int ready;
+  time_t ready;
   sd_stel();
   sd_stel(start_data *d);
 };

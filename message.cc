@@ -103,7 +103,7 @@ msg_start *start2msg(start_data *ms)
 int sethdr(char *buf, msg *ms)
 {
   buf[0] = ms->mtype();
-  pthread_t tid = ms->thread;
+  int64_t tid = ms->thread;
   memcpy(&(buf[1]), &tid, sizeof(int64_t));
   return 1+sizeof(int64_t);
 }
@@ -151,7 +151,7 @@ msg* decode(char *buf, int blen)
   ind = 0;
   Msgtype mt = (Msgtype)buf[ind];  
   ind++; 
-  pthread_t tid = 0;
+  int64_t tid = 0;
   memcpy(&tid, &(buf[ind]), sizeof(int64_t));
   ind+=sizeof(int64_t);
   

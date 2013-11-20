@@ -144,7 +144,7 @@ DWORD WINAPI geodesic_winthreads( LPVOID data )
 #ifdef LINUX
   tid = pthread_self();
 #elif WINDOWS
-  tid = GetCurrentThreadId(void);
+  tid = GetCurrentThreadId();
 #endif
   
   while (1)

@@ -15,7 +15,7 @@ public:
 #ifdef LINUX
   int64_t thread;
 #elif WINDOWS
-  
+  int64_t thread;
 #endif
   Msgtype mtype();
   msg();
