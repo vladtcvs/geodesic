@@ -6,6 +6,9 @@
 #include <pthread.h>
 #endif
 
+
+#include "client.h"
+#include "server.h"
 #include <iostream>
 #include <string.h>
 

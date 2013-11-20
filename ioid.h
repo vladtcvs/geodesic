@@ -71,7 +71,7 @@ int io_init(int argc, char **argv);
 int io_close();
 void save_pos(poskas pk, int io_id);
 
-void* recv_server(void* data);
+
 
 
 

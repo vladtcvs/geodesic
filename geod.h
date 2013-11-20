@@ -44,12 +44,6 @@ poskas runge_kutta4(poskas &pk, real h);
 extern char server_ip[20];
 extern char my_ip[20];
 
-#ifdef LINUX
-
-void* geodesic_pthread(void* data);
-#elif WINDOWS
-DWORD WINAPI geodesic_winthreads( LPVOID data );
-#endif
 
 #ifdef DEBUG
 #define PRINT_LOG printf("%s (%s:%i)\n", __FUNCTION__, __FILE__, __LINE__);
