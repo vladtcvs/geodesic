@@ -2,23 +2,28 @@
 #define __IOID_H__
 
 #include "geod.h"
-#ifdef WINDOWS
+
+#if WINDOWS
+
 #include <winsock.h>
-#elif LINUX
+
+#elif LINUX || MINIX
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+
 #endif
 
 class ioid
 {
    std::vector<double> msgbuf;
-#ifdef WINDOWS
+#if WINDOWS
    SOCKET udpSocket;
    int tid;
-#elif LINUX
+#elif LINUX || MINIX
    int udpSocket;   
    pid_t tid;
 #endif
@@ -39,7 +44,7 @@ class ioid
 struct client_id
 {
   sockaddr_in c_addr;
-#ifdef LINUX
+#if LINUX || MINIX
   socklen_t c_addr_l;
 #elif WINDOWS
   int c_addr_l;
@@ -51,9 +56,9 @@ struct client_id
 
 class srv_ioid
 {
-#ifdef WINDOWS
+#if WINDOWS
    SOCKET udpSocket;
-#elif LINUX
+#elif LINUX || MINIX
    int udpSocket;
 #endif
 public:

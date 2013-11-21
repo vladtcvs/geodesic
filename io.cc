@@ -31,7 +31,7 @@ void ioid::io_open()
   srv_addr.sin_family   = AF_INET;
   srv_addr.sin_port     = htons(2345); 
 
-#ifdef LINUX
+#if LINUX
   inet_aton(my_ip, &addr.sin_addr);
   inet_aton(server_ip, &srv_addr.sin_addr);
   bind(udpSocket, (struct sockaddr*)&addr, sizeof(addr));
@@ -52,7 +52,7 @@ void ioid::io_open()
 void ioid::io_close()
 {
   msgbuf.clear();
-#ifdef WINDOWS
+#if WINDOWS
   closesocket(udpSocket);
 #elif LINUX
   close(udpSocket);
@@ -112,7 +112,7 @@ srv_ioid::~srv_ioid()
 
 int srv_ioid::srv_open()
 {
-#ifdef LINUX
+#if LINUX || MINIX
   udpSocket = socket(PF_INET, SOCK_DGRAM, 0);
 #elif WINDOWS
   udpSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -135,7 +135,7 @@ int srv_ioid::srv_open()
   
   /* Переводим адрес в нужный нам формат */
   m_addr.sin_addr.s_addr = inet_addr(my_ip);
-#ifdef LINUX
+#if LINUX || MINIX
   int br = bind(udpSocket, (struct sockaddr*)&m_addr, sizeof(m_addr));
 #elif WINDOWS
   int br = bind(udpSocket, (LPSOCKADDR)&m_addr, sizeof(m_addr));
@@ -151,7 +151,7 @@ int srv_ioid::srv_open()
 
 void srv_ioid::srv_close()
 {
-#ifdef WINDOWS
+#if WINDOWS
     closesocket(udpSocket);
 #elif LINUX
     close(udpSocket);

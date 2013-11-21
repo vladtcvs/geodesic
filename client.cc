@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#ifdef LINUX
+#if LINUX
 #include <pthread.h>
 #endif
 
@@ -133,18 +133,22 @@ start_data *get_start(int64_t tid)
 }
 
 
-#ifdef LINUX
+#if LINUX
 void* geodesic_pthread(void* data)
+#elif MINIX
+void* geodesic_fork(void* data)
 #elif WINDOWS
 DWORD WINAPI geodesic_winthreads( LPVOID data )
 #endif
 {
   start_data *sd;
   int64_t tid;
-#ifdef LINUX
+#if LINUX
   tid = pthread_self();
 #elif WINDOWS
   tid = GetCurrentThreadId();
+#elif MINIX
+  tid = getpid();
 #endif
   
   while (1)
@@ -170,9 +174,11 @@ DWORD WINAPI geodesic_winthreads( LPVOID data )
     
     sd->close();
   }
-#ifdef LINUX
+#if LINUX
   return NULL;
 #elif WINDOWS
   return 0;
+#elif MINIX
+  return NULL;
 #endif
 }

@@ -42,7 +42,7 @@ tensor2 Metric(Lvector p)
 
 
 int cnt = 0;
-int maxcnt=10;
+int maxcnt=100;
 
 start_data *srv_get_start()
 {
@@ -85,8 +85,3 @@ start_data *srv_get_start()
   return ans;
 }
 
-
-void start_data::close()
-{
-  id.io_close();
-}

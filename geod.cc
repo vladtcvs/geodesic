@@ -2,7 +2,7 @@
 #include "ioid.h"
 #include "start.h"
 
-#ifdef LINUX
+#if LINUX
 #include <pthread.h>
 #endif
 
@@ -22,9 +22,9 @@ int main(int argc, char **argv)
 {
   
   int i;
-  int server = 0;
+ 
   
-#ifdef WINDOWS
+#if WINDOWS
   WSADATA wsaData;
   int iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
   if (iResult != 0) 
@@ -34,37 +34,29 @@ int main(int argc, char **argv)
   }
 #endif
   
-  if (argc > 1)
-  {
-    if (strcmp(argv[1],"server")==0)
-      server = 1;
-  } 
-  if (server)
-  {
-    int L = 4;
-    recv_server(&L);
-  }
-  else
-  {
     start_data sd;
     int numCPU = 2;
     
     
-#ifdef LINUX
+#if LINUX
     numCPU = sysconf(_SC_NPROCESSORS_ONLN);;
 #elif WINDOWS
 	SYSTEM_INFO sysinfo;
 	GetSystemInfo( &sysinfo );
 
 	numCPU = sysinfo.dwNumberOfProcessors;
+#elif MINIX
+	numCPU = 2;
 #endif
   
     int nthr = numCPU;
-#ifdef LINUX
+#if LINUX
     pthread_t* pth = new pthread_t[nthr];
 #elif WINDOWS
 	HANDLE *pth = new HANDLE[nthr];
 	DWORD *tid = new DWORD[nthr];
+#elif MINIX
+    pid_t *pth = new pid_t[nthr];
 #endif
 
 
@@ -73,18 +65,17 @@ int main(int argc, char **argv)
     
     if (argc > 1)
     {
-#ifdef WINDOWS
+#if WINDOWS
       strcpy_s(server_ip, argv[1]);
-#elif LINUX
+#elif LINUX || MINIX
       strcpy(server_ip, argv[1]);
 #endif
     }
-    io_init(argc, argv);
- 
+    
     for (i = 0; i < nthr; i++)
     {
       
-#ifdef WINDOWS
+#if WINDOWS
 	  pth[i] = CreateThread(NULL, 0, geodesic_winthreads, NULL, 0, &(tid[i]));
 	  // ждем, чтобы поток успел скопировать данные
 	  Sleep(100);
@@ -93,23 +84,27 @@ int main(int argc, char **argv)
 	  int res = pthread_create(&(pth[i]), NULL, geodesic_pthread, NULL);
 	  // ждем, чтобы поток успел скопировать данные
 	  usleep(100000);
+#elif MINIX
+	  pth[i] = fork();
+	  if (pth[i] == 0)
+	    geodesic_fork(NULL);
 #endif
 	}
   
 	   // ждем окончания всех потоков
  
-#ifdef WINDOWS
+#if WINDOWS
     WaitForMultipleObjects(nthr, pth, TRUE, INFINITE);
 	for(int i=0; i < nthr; i++)
         CloseHandle(pth[i]);
 #elif LINUX
     for (i = 0; i < nthr; i++)
       pthread_join(pth[i], NULL);
+#elif MINIX
+    ;
 #endif  
   
-    io_close();
-  
+    
     delete[] pth;
-  }
   return 0;
 }

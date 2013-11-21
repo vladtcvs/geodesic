@@ -5,16 +5,13 @@
 #include <vector>
 #include <stdio.h>
 
-#define WINDOWS 1
-
-//#define LINUX 1
-
-#ifdef LINUX
-#undef WINDOWS
-#endif
+#define WINDOWS 0
+#define MINIX  0
+#define LINUX 1
 
 
-#ifdef WINDOWS
+
+#if WINDOWS
 #include <Windows.h>
 #include <stdint.h>
 #endif

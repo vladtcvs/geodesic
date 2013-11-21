@@ -12,7 +12,7 @@ protected:
   Msgtype type;
   
 public:
-#ifdef LINUX
+#if LINUX || MINIX
   int64_t thread;
 #elif WINDOWS
   int64_t thread;

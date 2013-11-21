@@ -50,8 +50,8 @@ sd_stel::sd_stel(start_data* d)
  */
 void* recv_server(void* data)
 {
-  int L = *((int*)data);
-  int len = L*2+2;
+  int L;
+  int len = 1000;
   char buf[1000];
   
   
@@ -65,7 +65,7 @@ void* recv_server(void* data)
   int calc_id;
   
 //  int i;
-#ifdef LINUX  
+#if LINUX  || MINIX
   FILE *outf = fopen("out", "wt");
 #elif WINDOWS
   FILE *outf = NULL;
@@ -128,11 +128,9 @@ void* recv_server(void* data)
 				
 		//int res;
 		start_data *start;
-		{
-		  start = srv_get_start();
-		  if (start != NULL)
-		    sval.push_back(sd_stel(start));
-		}
+		
+		start = srv_get_start();
+		
 		if (start != NULL)
 		{		 
 		  char mess[1000];
