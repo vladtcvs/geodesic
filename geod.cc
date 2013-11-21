@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 	numCPU = 2;
 #endif
   
-    int nthr = numCPU;
+    int nthr = 1;
 #if LINUX
     pthread_t* pth = new pthread_t[nthr];
 #elif WINDOWS
