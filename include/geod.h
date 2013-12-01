@@ -44,7 +44,7 @@ extern const real H;
 
 tensor2 dGi(Lvector p, int n);
 tensor3 Kristofel(Lvector p);
-tensor2 Metric(Lvector p);
+
 poskas runge_kutta4(poskas &pk, real h);
 
 

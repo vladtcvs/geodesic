@@ -11,6 +11,7 @@
 #include "geod.h"
 
 
+
 int m1p(int i, int j)
 {
   return (1-2*((i+j)%2));
@@ -186,7 +187,6 @@ tensor2 tensor2::operator += (tensor2 t)
 	return *this;
 }
 
-
 tensor2 tensor2::operator * (real n)
 {
 	tensor2 res(L);
@@ -195,6 +195,18 @@ tensor2 tensor2::operator * (real n)
 		res[i] = m[i]*n;
 	return res;
 }
+
+
+
+tensor2 tensor2::operator *= (real n)
+{
+	int i;
+	for (i = 0; i < L; i++)
+		m[i]*=n;
+	return *this;
+}
+
+
 
 tensor2 tensor2::adj(int i, int j)
 {
@@ -310,6 +322,21 @@ Lvector& tensor2::operator [] (int i)
 		throw 2;
 	}
 	return m[i];
+}
+
+
+double tensor2::scalar(Lvector a, Lvector b)
+{
+  double s = 0;
+  int i, j;
+  int D = dim();
+  
+  if (a.dim() != D || b.dim() != D)
+    return -BAD_DOUBLE;;
+  for (i = 0; i < D; i++)
+  for (j = 0; j < D; j++)
+    s += m[i][j] * a[i] * b[j];
+  return s;
 }
 
 
@@ -430,3 +457,56 @@ poskas::poskas(int l)
 	p.alloc(l);
 	v.alloc(l);
 }
+
+
+
+int posopr(tensor2 t)
+{
+  int pos = 0;
+  int k = 1;
+  double Det = t.det();
+  if (Det > eps)
+    pos = 1;
+  else if (Det < -eps)
+    pos = -1;
+  else
+    return pos;
+  
+  int D = t.dim();
+  if (D == 1)
+    return pos;
+  
+  int i, j;
+  tensor2 subt;
+  
+  
+  if (pos == -1)
+  {
+    t *= -1;
+    pos = 1;
+    k = -1;
+  }
+  for (i = 1; i <= D-1; i++)
+  {
+    subt.alloc(i);
+   
+    for (j = 0; j <= D-i; j++)
+    {
+      int x, y;
+      for (x = 0; x < i; x++)
+      for (y = 0; y < i; y++)
+      {
+	subt[x][y] = t[x+j][y+j];
+	
+      }
+      double DD = subt.det();
+      if (DD > eps && pos == -1 || DD < -eps && pos == 1 || fabs(DD) < eps)
+	return 0;
+    }
+  }
+  return k;
+}
+
+
+
+

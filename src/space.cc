@@ -10,7 +10,7 @@
 
 
 #include "geod.h"
-
+#include "task.h"
 real a=20;
 
 
@@ -33,7 +33,7 @@ tensor2 dGi(Lvector p, int n)
 		  continue;
 		Lvector dp = h * (i-2);
 		tensor2 metr = Metric(p + dp);
-		res += metr*(coef[i]);
+		res += metr*((real)(coef[i]));
 	}
 
 

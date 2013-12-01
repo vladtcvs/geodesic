@@ -15,7 +15,7 @@
 
 #include "geod.h"
 
-
+poskas emit_object_vel(Lvector pos, double vel, Lvector dir);
 
 
 #endif /* __EMIT_H__ */

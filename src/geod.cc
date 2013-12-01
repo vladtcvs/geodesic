@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 	numCPU = 2;
 #endif
   
-    int nthr = 1;
+    int nthr = numCPU;
 #if LINUX
     pthread_t* pth = new pthread_t[nthr];
 #elif WINDOWS

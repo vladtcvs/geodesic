@@ -17,6 +17,7 @@
 typedef long double real;
 
 
+#define BAD_DOUBLE 1.2345678987654321
 class Lvector
 {
 	private:
@@ -57,7 +58,11 @@ class tensor2
 	Lvector& operator [] (int i);
 	tensor2 operator / (real n);
 	tensor2 operator * (real n);
+	tensor2 operator *= (real n);
+	
 	tensor2 operator += (tensor2 t);
+	
+	double scalar(Lvector a, Lvector b);
 
 };
 
@@ -93,5 +98,7 @@ class poskas
 	poskas operator /= (real n);
 
 };
+
+int posopr(tensor2 t);
 
 #endif

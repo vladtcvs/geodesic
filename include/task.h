@@ -14,5 +14,5 @@
 
 #include "message.h"
 start_data *srv_get_start();
-
+tensor2 Metric(Lvector p);
 #endif

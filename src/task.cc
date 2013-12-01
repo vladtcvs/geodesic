@@ -13,6 +13,7 @@
 #include "start.h"
 
 #include "message.h"
+#include "emit.h"
 
 const real PI = 3.1415926535897932384626433832795;
 
@@ -53,7 +54,7 @@ tensor2 Metric(Lvector p)
 
 
 int cnt = 0;
-int maxcnt=10;
+int maxcnt=50;
 
 start_data *srv_get_start()
 {
@@ -69,21 +70,35 @@ start_data *srv_get_start()
   start_data *ans;
   
   ans = new start_data;
-  poskas pk(4);
   
   double Rs = 1;
-  double R = (1.49+cnt*0.01)*Rs;
+  double R = (5+cnt*0.1)*Rs;
   double PI = 3.1415926535897932384626433832795;
   double K = 1;
-  double v = 0.99;
+  double v = 0.2;
+  
+  Lvector pos(4), dir(4);
+  pos[0] = 0;
+  pos[1] = R;
+  pos[2] = PI/2;
+  pos[3] = 0;
+  
+  dir[1] = 1;
+  dir[2] = 0;
+  dir[3] = 1;
   
   
+  poskas pk = emit_object_vel(pos, v, dir);
+  
+  
+  /*
+   * 
   pk.p[0] = 0;
   pk.p[1] = R;
   pk.p[2] = PI/2;
   pk.v[0] = K;
   pk.v[3] = v*K*sqrt((R-Rs)/R)/R;
-
+*/
   
   ans->pk = pk;
   ans->calc_id = cnt;
