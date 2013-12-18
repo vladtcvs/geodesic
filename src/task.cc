@@ -14,6 +14,8 @@
 
 #include "message.h"
 #include "emit.h"
+#include <stdlib.h>
+#include <list>
 
 const real PI = 3.1415926535897932384626433832795;
 
@@ -54,43 +56,100 @@ tensor2 Metric(Lvector p)
 
 
 int cnt = 0;
-int maxcnt=50;
+int maxcnt=1;
+int lcnt = -1;
+
+struct light_src
+{
+  poskas pk;
+  int nl;
+};
+
+std::list<light_src> pnt;
+
 
 start_data *srv_get_start()
 {
   
   
-  if (cnt >= maxcnt)
-  {
-    start_data *ans = NULL;
-    
-    
-    return ans;
-  }
+  
   start_data *ans;
   
   ans = new start_data;
   
-  double Rs = 1;
-  double R = (5+cnt*0.1)*Rs;
-  double PI = 3.1415926535897932384626433832795;
-  double K = 1;
-  double v = 0.2;
   
-  Lvector pos(4), dir(4);
-  pos[0] = 0;
-  pos[1] = R;
-  pos[2] = PI/2;
-  pos[3] = 0;
+  poskas pk;
   
-  dir[1] = 1;
-  dir[2] = 0;
-  dir[3] = 1;
+  if (pnt.size() == 0)
+  {
+    
+    double Rs = 1;
+    double R = (3+cnt*0.1)*Rs;
+    double PI = 3.1415926535897932384626433832795;
+    double K = 1;
+    double v = 0.5;
   
+    Lvector pos(4), dir(4);
+    pos[0] = 0;
+    pos[1] = R;
+    pos[2] = PI/2;
+    pos[3] = 0;
   
-  poskas pk = emit_object_vel(pos, v, dir);
+    dir[1] = 1;
+    dir[2] = 0;
+    dir[3] = 1;
   
-  
+    
+    if (cnt >= maxcnt)
+    {
+      start_data *ans = NULL;
+    
+    
+      return ans;
+    }
+    pk = emit_object_vel(pos, v, dir);
+    ans->pk = pk;
+    ans->calc_id = cnt;
+    ans->N = 50;
+    ans->h = 30;
+    ans->dh = 1e-2;
+    cnt++;
+  }
+  else
+  {
+    light_src lsr = pnt.front();
+    
+    pnt.pop_front();
+    
+    pk = lsr.pk;
+    lsr.nl--;
+    if (lsr.nl >= 1)
+      pnt.push_front(lsr);
+    
+    Lvector dir;
+    dir.alloc(4);
+    
+    do
+    {
+      dir[1] = (((double)rand())/RAND_MAX)*2-1;
+      dir[2] = (((double)rand())/RAND_MAX)*2-1;
+      dir[3] = (((double)rand())/RAND_MAX)*2-1;
+    }
+    while (dir[1] == 0 && dir[2] == 0 && dir[3] == 0);
+    int i;
+    real s = 0;
+    for (i = 1; i < 4; i++)
+      s += sqr(dir[i]);
+    s = sqrt(s);
+    dir /= s;
+    pk=emit_object_vel(pk.p, 1, dir);
+    ans->pk = pk;
+    ans->calc_id = lcnt;
+    ans->N = 100;
+    ans->h = 30;
+    ans->dh = 1e-2;
+    lcnt--;
+  }
   /*
    * 
   pk.p[0] = 0;
@@ -100,14 +159,16 @@ start_data *srv_get_start()
   pk.v[3] = v*K*sqrt((R-Rs)/R)/R;
 */
   
-  ans->pk = pk;
-  ans->calc_id = cnt;
-  ans->N = 1000;
-  ans->h = 30;
-  ans->dh = 1e-2;
   
-  cnt++;
+  
   
   return ans;
 }
 
+
+
+void push_pos(poskas pk)
+{
+  light_src lsr={pk,20};
+  pnt.push_back(lsr);
+}

@@ -127,7 +127,8 @@ void* recv_server(void* data)
 			save_pos(outf, pk, calc_id);
 			PRINT_LOG
 			
-			
+			if (calc_id >= 0)
+			  push_pos(pk);
 	      }
 	      break;
 	    case GD_GETNEW:

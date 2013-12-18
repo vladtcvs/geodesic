@@ -14,7 +14,7 @@ cmake_minimum_required (VERSION 2.4)
 project(geodesic)
 
 add_executable(geodesic_client src/message.cc src/start.cc src/client.cc src/light_source.cc src/io.cc src/tensors.cc src/space.cc src/runge.cc src/geod.cc)
-add_executable(geodesic_server src/server_main.cc src/message.cc src/start.cc src/server.cc src/light_source.cc src/io.cc src/tensors.cc  )
+add_executable(geodesic_server src/eye.cc src/server_main.cc src/message.cc src/start.cc src/server.cc src/light_source.cc src/io.cc src/tensors.cc  )
 add_library(task SHARED src/task.cc src/tensors.cc src/start.cc src/emit.cc)
 
 install(TARGETS geodesic_server geodesic_client task  DESTINATION bin)

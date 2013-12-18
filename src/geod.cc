@@ -31,7 +31,8 @@ const real H=1e-5;
 
 int main(int argc, char **argv)
 {
-  
+  try
+  {
   int i;
  
   
@@ -117,5 +118,11 @@ int main(int argc, char **argv)
   
     
     delete[] pth;
+  }
+  catch(int err)
+  {
+    std::cout<<"exception "<<err<<"\n";
+    
+  }
   return 0;
 }

@@ -20,7 +20,10 @@ int m1p(int i, int j)
 void Lvector::alloc(int i)
 {
 	L = i;
+	int k;
 	V.resize(L);
+	for (k = 0; k < L; k++)
+	  V[k] = 0;
 }
 
 
@@ -54,7 +57,7 @@ real& Lvector::operator [] (int i)
 	return V[i];
 }
 
-Lvector Lvector::operator + (Lvector &v)
+Lvector Lvector::operator + (Lvector v)
 {
 	int i;
 	if (L != v.L)
@@ -69,7 +72,7 @@ Lvector Lvector::operator + (Lvector &v)
 }
 
 
-Lvector Lvector::operator - (Lvector &v)
+Lvector Lvector::operator - (Lvector v)
 {
 	int i;
 	if (L != v.L)
@@ -81,7 +84,7 @@ Lvector Lvector::operator - (Lvector &v)
 }
 
 
-Lvector Lvector::operator += (Lvector &v)
+Lvector Lvector::operator += (Lvector v)
 {
 	int i;
 	if (L != v.L)
@@ -94,7 +97,7 @@ Lvector Lvector::operator += (Lvector &v)
 	return *this;
 }
 
-Lvector Lvector::operator -= (Lvector &v)
+Lvector Lvector::operator -= (Lvector v)
 {
 	int i;
 	if (L != v.L)
@@ -508,5 +511,28 @@ int posopr(tensor2 t)
 }
 
 
+tensor2 spacesubm(tensor2 G)
+{
+  tensor2 s;
+  int dim = G.dim();
+  s.alloc(dim-1);
+  int i, j;
+  for (i = 0; i < dim-1; i++)
+  for (j = 0; j < dim-1; j++)
+  {
+    s[i][j] = G[i+1][j+1];
+  }
+  return s;
+}
 
-
+Lvector spacesubv(Lvector v)
+{
+  Lvector s;
+  int dim = v.dim();
+  int i;
+  for (i = 0; i < dim; i++)
+  {
+    s[i] = v[i+1];
+  }
+  return s;
+}

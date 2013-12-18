@@ -30,10 +30,10 @@ class Lvector
 		void alloc(int n);
 		int dim() {return L;}
 		real& operator [] (int i);
-		Lvector operator + (Lvector &v);
-		Lvector operator - (Lvector &v);
-		Lvector operator += (Lvector &v);
-		Lvector operator -= (Lvector &v);
+		Lvector operator + (Lvector v);
+		Lvector operator - (Lvector v);
+		Lvector operator += (Lvector v);
+		Lvector operator -= (Lvector v);
 		Lvector operator * (real n);
 		Lvector operator *= (real n);
 
@@ -100,5 +100,7 @@ class poskas
 };
 
 int posopr(tensor2 t);
+tensor2 spacesubm(tensor2 G);
+Lvector spacesubv(Lvector v);
 
 #endif

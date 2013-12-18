@@ -153,6 +153,7 @@ DWORD WINAPI geodesic_winthreads( LPVOID data )
 {
   start_data *sd;
   int64_t tid;
+  
 #if LINUX
   tid = pthread_self();
 #elif WINDOWS
@@ -161,28 +162,48 @@ DWORD WINAPI geodesic_winthreads( LPVOID data )
   tid = getpid();
 #endif
   
-  while (1)
-  {
-    sd = get_start(tid);
-    if (sd == NULL)
-    {
-      PRINT_LOG
-      break;
-    }
-    PRINT_LOG
-    
-    geodesic(sd);
-    msg_fin *mf = new msg_fin;
-    mf->calc_id = sd->calc_id;
-    mf->thread = tid;
-    char buf[1000];
-    printf("FIN: calc_id = %i\n", mf->calc_id);
-    int len = encode(buf, 1000, mf);
-    sd->id.write(buf,len);
-    delete mf;
+  bool go = true;
   
+  while (go)
+  {
+    try
+    {
+      while (1)
+      {
+	sd = get_start(tid);
+	if (sd == NULL)
+	{	
+	  PRINT_LOG
+	  go = false;
+	  break;
+	}
+	PRINT_LOG
     
-    sd->close();
+	geodesic(sd);
+	msg_fin *mf = new msg_fin;
+	mf->calc_id = sd->calc_id;
+	mf->thread = tid;
+	char buf[1000];
+	printf("FIN: calc_id = %i\n", mf->calc_id);
+	int len = encode(buf, 1000, mf);
+	sd->id.write(buf,len);
+	delete mf;   
+	sd->close();
+      }
+    }
+    catch(int err)
+    {
+      std::cout<<"exeption #"<<err<<"\n";
+      std::cout<<"sending FIN\n";
+      msg_fin *mf = new msg_fin;
+      mf->calc_id = sd->calc_id;
+      mf->thread = tid;
+      char buf[1000];
+      int len = encode(buf, 1000, mf);
+      sd->id.write(buf,len);
+      delete mf;
+      sd->close();
+    }
   }
 #if LINUX
   return NULL;
@@ -191,4 +212,5 @@ DWORD WINAPI geodesic_winthreads( LPVOID data )
 #elif MINIX
   return NULL;
 #endif
+  
 }

@@ -59,5 +59,7 @@ extern char my_ip[20];
 #define PRINT_LOG {;}
 #endif
 
+#define DIM 4
+
 
 #endif
