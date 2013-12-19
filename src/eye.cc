@@ -33,10 +33,8 @@ real eye::angle_dir(poskas pk)
 {
   real cs = 0, ca = 0, cb = 0;
   int i, j;
-  tensor2 G = Metric(pk.p);
-  int dim = pk.p.dim();
-  tensor2 G3 = spacesubm(G);
-  Lvector dir3 = spacesubv(dir);
+  
+  
   Lvector vel = spacesubv(pk.v);
   
   
@@ -57,9 +55,7 @@ real eye::angle_dir(poskas pk)
 real eye::angle_top(poskas pk)
 {
   real ca, cs, cw;
-  tensor2 G3 = spacesubm(Metric(pk.p));
-  Lvector dir3 = spacesubv(dir);
-  Lvector top3 = spacesubv(top);
+  
   Lvector vel = spacesubv(pk.v);
   
   
@@ -76,4 +72,43 @@ real eye::angle_top(poskas pk)
   cw = G3.scalar(top3, vel);
   
   return acos(-cw);
+}
+
+obspnt eye::observe(poskas pk)
+{
+  obspnt res;
+  res.u = if_in_eye(pk);
+  if (res.u)
+  {
+    res.ang = angle_dir(pk);
+    res.dir = angle_top(pk);
+  }
+  
+  return res;
+}
+
+
+void eye::init(Lvector npos, Lvector ntop, Lvector ndir, real nsize, real ndt)
+{
+  dt = ndt;
+  size = nsize;
+  
+  pos = npos;
+  
+  tensor2 G = Metric(npos);
+  G3 = spacesubm(G);
+  
+  real ca = G3.scalar(ndir, ndir);
+  ca = sqrt(ca);
+  ndir /= ca;
+  
+  real cw = G3.scalar(ntop, ndir);
+  ntop -= ndir*cw;
+  
+  real cb = G3.scalar(ntop, ntop);
+  cb = sqrt(cb);
+  ntop /= cb;
+  
+  dir3 = spacesubv(ndir);
+  top3 = spacesubv(ntop);
 }

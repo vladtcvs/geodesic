@@ -17,6 +17,8 @@
 #include <stdlib.h>
 #include <list>
 
+#include "eye.h"
+
 const real PI = 3.1415926535897932384626433832795;
 
 static real sqr(real x)
@@ -89,7 +91,7 @@ start_data *srv_get_start()
     double K = 1;
     double v = 0.5;
   
-    Lvector pos(4), dir(4);
+    Lvector pos(DIM), dir(DIM);
     pos[0] = 0;
     pos[1] = R;
     pos[2] = PI/2;
@@ -102,9 +104,7 @@ start_data *srv_get_start()
     
     if (cnt >= maxcnt)
     {
-      start_data *ans = NULL;
-    
-    
+      ans = NULL;
       return ans;
     }
     pk = emit_object_vel(pos, v, dir);
@@ -127,7 +127,7 @@ start_data *srv_get_start()
       pnt.push_front(lsr);
     
     Lvector dir;
-    dir.alloc(4);
+    dir.alloc(DIM);
     
     do
     {
@@ -138,7 +138,7 @@ start_data *srv_get_start()
     while (dir[1] == 0 && dir[2] == 0 && dir[3] == 0);
     int i;
     real s = 0;
-    for (i = 1; i < 4; i++)
+    for (i = 1; i < DIM; i++)
       s += sqr(dir[i]);
     s = sqrt(s);
     dir /= s;
@@ -150,18 +150,7 @@ start_data *srv_get_start()
     ans->dh = 1e-2;
     lcnt--;
   }
-  /*
-   * 
-  pk.p[0] = 0;
-  pk.p[1] = R;
-  pk.p[2] = PI/2;
-  pk.v[0] = K;
-  pk.v[3] = v*K*sqrt((R-Rs)/R)/R;
-*/
-  
-  
-  
-  
+ 
   return ans;
 }
 
@@ -171,4 +160,13 @@ void push_pos(poskas pk)
 {
   light_src lsr={pk,20};
   pnt.push_back(lsr);
+}
+
+
+eye get_observer()
+{
+  eye obs;
+  
+  
+  return obs;
 }

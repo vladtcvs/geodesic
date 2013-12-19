@@ -14,20 +14,32 @@
 
 #include "geod.h"
 
+struct obspnt
+{
+  bool u;
+  real ang, dir;
+};
+
+
 class eye
 {
 Lvector pos;
-Lvector dir;
-Lvector top;
 real size;
 real dt;
-real aov;
-public:
+
+Lvector dir3;
+Lvector top3;
+tensor2 G3;
+
+
   bool if_in_eye(poskas pk);
   real angle_dir(poskas pk);
   real angle_top(poskas pk);
+public:
+  eye(){ dt = 0;size = 0;}
+  void init(Lvector npos, Lvector ntop, Lvector ndir, real nsize, real ndt);
+  obspnt observe(poskas pk);
 };
-
 
 
 #endif

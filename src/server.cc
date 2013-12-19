@@ -22,7 +22,7 @@
 
 #include <time.h>
 #include "server.h"
-
+#include "eye.h"
 
 /**
  * Эта функция запускается только на сервере, она сохраняет принятые от клиентов 
@@ -38,6 +38,17 @@ static void save_pos(FILE *outf, poskas pk, int calc_id)
       fprintf(outf, "%lf ", (double)(pk.p[i]));
     fprintf(outf,"\n");
     fflush(outf);
+}
+
+static void draw_point(FILE *outf, obspnt pnt)
+{
+  if (pnt.u)
+  {
+    int x = pnt.ang * cos(pnt.dir);
+    int y = pnt.ang * sin(pnt.dir);
+    fprintf(outf, "%lf %lf\n", x, y);
+    
+  }
 }
 
 
@@ -64,6 +75,8 @@ void* recv_server(void* data)
   int L;
   int len = 1000;
   char buf[1000];
+  
+  eye observer = get_observer();
   
   
   std::list<sd_stel> sval;
@@ -124,11 +137,21 @@ void* recv_server(void* data)
 			std::list<sd_stel>::iterator it;
 			
 			
-			save_pos(outf, pk, calc_id);
+			//save_pos(outf, pk, calc_id);
 			PRINT_LOG
 			
 			if (calc_id >= 0)
+			{
 			  push_pos(pk);
+			}
+			else
+			{
+			  obspnt op = observer.observe(pk);
+			  if (op.u)
+			  {
+			    draw_point(outf, op);
+			  }
+			}
 	      }
 	      break;
 	    case GD_GETNEW:

@@ -13,7 +13,10 @@
 #define TASK_H
 
 #include "message.h"
+#include "eye.h"
 start_data *srv_get_start();
 tensor2 Metric(Lvector p);
 void push_pos(poskas pk);
+eye get_observer();
+
 #endif
