@@ -47,7 +47,7 @@ tensor2& tensor3::operator [] (int i)
 	if (i < 0 || i >= L)
 	{
 	  PRINT_LOG
-		throw 2;
+		throw EIND;
 	}
 	return m[i];
 }

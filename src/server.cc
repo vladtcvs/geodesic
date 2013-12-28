@@ -137,13 +137,14 @@ void* recv_server(void* data)
 			std::list<sd_stel>::iterator it;
 			
 			
-			//save_pos(outf, pk, calc_id);
+			save_pos(outf, pk, calc_id);
 			PRINT_LOG
 			
 			if (calc_id >= 0)
 			{
 			  push_pos(pk);
 			}
+			/*
 			else
 			{
 			  obspnt op = observer.observe(pk);
@@ -151,7 +152,7 @@ void* recv_server(void* data)
 			  {
 			    draw_point(outf, op);
 			  }
-			}
+			}*/
 	      }
 	      break;
 	    case GD_GETNEW:

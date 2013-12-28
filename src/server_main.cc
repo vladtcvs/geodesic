@@ -18,8 +18,8 @@
 #include <pthread.h>
 #endif
 
+#include "errors.h"
 
-#include "client.h"
 #include "server.h"
 #include <iostream>
 #include <string.h>
@@ -45,7 +45,14 @@ int main(int argc, char **argv)
     return 1;
   }
 #endif
+  try
+  {
   
-  
-  recv_server(NULL);
+    recv_server(NULL);
+  }
+  catch(int errnum)
+  {
+    std::cerr<<error_str(errnum)<<"\n";
+    
+  }
 }

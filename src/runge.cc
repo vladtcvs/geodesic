@@ -40,7 +40,10 @@ poskas runge_run(poskas pos, real dh, real hmax)
     real h = 0;
     do
     {
-      pk = runge_kutta4(pk,dh);
+      poskas pp = runge_kutta4(pk,dh);
+      if (pp.p.dim() != pk.p.dim())
+	throw EDIM;
+      pk = pp;
       h += dh;
     } 
     while(h <= hmax);

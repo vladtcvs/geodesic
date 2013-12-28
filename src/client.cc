@@ -184,7 +184,7 @@ DWORD WINAPI geodesic_winthreads( LPVOID data )
     }
     catch(int err)
     {
-      std::cout<<"exeption #"<<err<<"\n";
+      std::cout<<"exeption "<<error_str(err)<<"\n";
       std::cout<<"sending FIN\n";
       msg_fin *mf = new msg_fin;
       mf->calc_id = sd->calc_id;

@@ -15,6 +15,7 @@
 #include <vector>
 #include <math.h>
 #include "macros.h"
+#include "errors.h"
 
 typedef long double real;
 

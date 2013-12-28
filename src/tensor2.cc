@@ -25,7 +25,7 @@ tensor2 tensor2::operator / (real n)
 	if (fabs(n) < eps)
 	{	
 		PRINT_LOG
-		throw 0;
+		throw EZERO;
 	}
 	int i;
 	for (i = 0; i < L; i++)
@@ -39,7 +39,7 @@ tensor2 tensor2::operator += (tensor2 t)
 	if(L!=t.dim())
 	{
 	  PRINT_LOG
-		throw 1;
+		throw EDIM;
 	}
 	int i;
 	for (i = 0; i < L; i++)
@@ -101,7 +101,7 @@ real tensor2::det()
 	if (L == 0)
 	{
 	  PRINT_LOG
-		throw 2;
+		throw EDIM;
 	}
 	if (L == 1)
 	{
@@ -129,7 +129,7 @@ tensor2 tensor2::inv()
 	if (fabs(d)< eps)
 	{
 	  PRINT_LOG
-		throw 0;
+		throw EZERO;
 	}
 	tensor2 res(L);
 	int i, j;
@@ -179,7 +179,7 @@ Lvector& tensor2::operator [] (int i)
 	if (i < 0 || i >= L)
 	{
 	  PRINT_LOG
-		throw 2;
+		throw EIND;
 	}
 	return m[i];
 }

@@ -13,6 +13,7 @@
 #include "emit.h"
 #include "task.h"
 
+#include "errors.h"
 /**
  * This function creates new object, moving with speed vel and
  * with random direction
@@ -32,21 +33,19 @@ poskas emit_object_vel(Lvector pos, double vel, Lvector dir)
   int i, j, D = pos.dim(), fail = 0;
   
   if (D != 4)
-    return res;
+  {
+    throw EDIM;
+  }
   for (i = 1; i < D; i++)
   {
     if (G[0][i] != 0 || G[i][0] != 0)
     {
-      fail=1;
-      break;
+      throw ETYPE;
     }
     
   }
-  if (fail == 1)
-    return res;
-  
   if (G[0][0] < 0)
-    return res;
+    throw ETYPE;
   
   tensor2 Gs;
   Gs.alloc(D-1);

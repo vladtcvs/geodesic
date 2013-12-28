@@ -46,7 +46,7 @@ real& Lvector::operator [] (int i)
 	if (i >= L || i < 0)
 	{
 	  PRINT_LOG
-		throw 2;
+		throw EIND;
 	}
 	return V[i];
 }
@@ -57,7 +57,7 @@ Lvector Lvector::operator + (Lvector v)
 	if (L != v.L)
 	{
 	  PRINT_LOG
-		throw 1;
+		throw EDIM;
 	}
 	Lvector res(L);
 	for (i = 0; i < L; i++)
@@ -70,7 +70,7 @@ Lvector Lvector::operator - (Lvector v)
 {
 	int i;
 	if (L != v.L)
-		throw 1;
+		throw EDIM;
 	Lvector res(L);
 	for (i = 0; i < L; i++)
 		res[i] = V[i] - v.V[i];
@@ -84,7 +84,7 @@ Lvector Lvector::operator += (Lvector v)
 	if (L != v.L)
 	{
 	  PRINT_LOG
-		throw 1;
+		throw EDIM;
 	}
 	for (i = 0; i < L; i++)
 		 V[i] += v.V[i];
@@ -97,7 +97,7 @@ Lvector Lvector::operator -= (Lvector v)
 	if (L != v.L)
 	{
 	  PRINT_LOG
-		throw 1;
+		throw EDIM;
 	}
 	for (i = 0; i < L; i++)
 		 V[i] -= v.V[i];
@@ -120,7 +120,7 @@ Lvector Lvector::operator / (real n)
 	if (fabs(n) < eps)
 	{
 	  PRINT_LOG
-		throw 0;
+		throw EZERO;
 	}
 	Lvector res(L);
 	int i;
@@ -147,7 +147,7 @@ Lvector Lvector::operator /= (real n)
 	if (fabs(n) < eps)
 	{
 	        PRINT_LOG
-		throw 0;
+		throw EZERO;
 	}
 	for (i = 0; i < L; i++)
 		V[i] /= n;

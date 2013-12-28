@@ -20,7 +20,7 @@
 
 #include "message.h"
 
-char server_ip[20]="192.168.1.238";
+char server_ip[20]="127.0.0.1";
 
 char my_ip[20]="0.0.0.0";
 
