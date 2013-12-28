@@ -11,6 +11,7 @@
 #include "geod.h"
 #include "start.h"
 #include "message.h"
+#include "runge.h"
 
 #include <iostream>
 
@@ -18,19 +19,7 @@
 #include <pthread.h>
 #endif
 
-static inline poskas geodesic_step(poskas pos, real dh, real h1)
-{
-    poskas pk=pos;
-    real h = 0;
-    do
-    {
-      pk = runge_kutta4(pk,dh);
-      h += dh;
-    } 
-    while(h <= h1);
-  
-    return pk;
-}
+
 
 static int check_pk(poskas pk)
 {
@@ -49,7 +38,9 @@ static inline poskas geodesic(start_data *sd)
   poskas pk = sd->pk;
   real h = 0;
   int i = 0;
- 
+
+  set_runge_fun(my_runge_fun);
+  
   int d=pk.p.dim();
   
   msg_poskas *mess = new msg_poskas;
@@ -67,7 +58,7 @@ static inline poskas geodesic(start_data *sd)
     if (sd->id.write(buf,len) == -1) 
       break;
     
-    pk=geodesic_step(pk,sd->dh,sd->h/sd->N);
+    pk=runge_run(pk,sd->dh,sd->h/sd->N);
     
     if (check_pk(pk)==0)
       break;

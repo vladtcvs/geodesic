@@ -13,6 +13,8 @@
 #define TENSOR_H
 
 #include <vector>
+#include <math.h>
+#include "macros.h"
 
 typedef long double real;
 
@@ -103,4 +105,10 @@ int posopr(tensor2 t);
 tensor2 spacesubm(tensor2 G);
 Lvector spacesubv(Lvector v);
 
+
+extern const int deflen;
+extern const real eps;
+
+
 #endif
+

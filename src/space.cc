@@ -80,3 +80,18 @@ tensor3 Kristofel(Lvector p)
 	return res;
 }
 
+poskas my_runge_fun(poskas pk)
+{
+	
+	int L = pk.v.dim();
+	poskas res(L);
+	Lvector dv(L);
+	tensor3 Gm = Kristofel(pk.p);
+	res.p = pk.v;
+	int i, j, k;
+	for (i = 0; i < L; i++)
+	for (j = 0; j < L; j++)
+	for (k = 0; k < L; k++)
+		res.v[i] -= Gm[i][j][k]*pk.v[j]*pk.v[k];
+	return res;
+}

@@ -1,4 +1,4 @@
-/** File geod.h author Vladislav Tcendrovskii
+/** File runge.h author Vladislav Tcendrovskii
  *  Copyright (c) 2013
  *  This source subjected to the Gnu General Public License v3 or later (see LICENSE)
  *  All other rights reserved
@@ -8,47 +8,15 @@
  *  OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  * */
 
-
-#ifndef GEOD_H
-#define GEOD_H
-#include <math.h>
-#include <stdlib.h>
-#include <vector>
-#include <stdio.h>
-
-
-
-#if WINDOWS
-#include <Windows.h>
-#include <stdint.h>
-#endif
+#ifndef RUNGE_H
+#define RUNGE_H
 
 #include "tensor.h"
 
+typedef poskas (*runge_fun)(poskas pk);
 
 
-
-extern const real H;
-
-
-
-
-
-
-
-
-tensor2 dGi(Lvector p, int n);
-tensor3 Kristofel(Lvector p);
-
-poskas my_runge_fun(poskas pk);
-
-
-
-extern char server_ip[20];
-extern char my_ip[20];
-
-
-#define DIM 4
-
+poskas runge_run(poskas pos, real dh, real hmax);
+void set_runge_fun(runge_fun sfun);
 
 #endif
