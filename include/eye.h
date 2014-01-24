@@ -24,20 +24,21 @@ struct obspnt
 class eye
 {
 Lvector pos;
-real size;
-real dt;
+Lvector dp;
+
 
 Lvector dir3;
 Lvector top3;
 tensor2 G3;
 
 
-  bool if_in_eye(poskas pk);
+  
   real angle_dir(poskas pk);
   real angle_top(poskas pk);
 public:
-  eye(){ dt = 0;size = 0;}
-  void init(Lvector npos, Lvector ntop, Lvector ndir, real nsize, real ndt);
+  bool if_in_eye(poskas pk);
+  eye(){ }
+  void init(Lvector npos, Lvector ntop, Lvector ndir, Lvector ndp);
   obspnt observe(poskas pk);
 };
 

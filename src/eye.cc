@@ -18,11 +18,10 @@ bool eye::if_in_eye(poskas pk)
 {
   int i;
   int dim = pk.p.dim();
-  if (fabs(pk.p[0]-pos[0]) > dt)
-    return false;
-  for (i = 1; i < dim; i++)
+  
+  for (i = 0; i < dim; i++)
   {
-    if (fabs(pk.p[i]-pos[i]) > size)
+    if (fabs(pk.p[i]-pos[i]) > dp[i])
       return false;  
   }
   
@@ -88,10 +87,10 @@ obspnt eye::observe(poskas pk)
 }
 
 
-void eye::init(Lvector npos, Lvector ntop, Lvector ndir, real nsize, real ndt)
+void eye::init(Lvector npos, Lvector ntop, Lvector ndir, Lvector ndp)
 {
-  dt = ndt;
-  size = nsize;
+  PRINT_LOG;
+  dp = ndp;
   
   pos = npos;
   
@@ -110,5 +109,6 @@ void eye::init(Lvector npos, Lvector ntop, Lvector ndir, real nsize, real ndt)
   ntop /= cb;
   
   dir3 = spacesubv(ndir);
+
   top3 = spacesubv(ntop);
 }

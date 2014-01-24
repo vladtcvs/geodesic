@@ -161,7 +161,7 @@ Lvector spacesubv(Lvector v)
   Lvector s;
   int dim = v.dim();
   int i;
-  for (i = 0; i < dim; i++)
+  for (i = 0; i < dim-1; i++)
   {
     s[i] = v[i+1];
   }

@@ -16,6 +16,8 @@
 #define MINIX  0
 #define LINUX 1
 
+#include <stdio.h>
+
 #ifdef DEBUG
 #define PRINT_LOG printf("%s (%s:%i)\n", __FUNCTION__, __FILE__, __LINE__);
 #else

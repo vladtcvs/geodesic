@@ -110,7 +110,7 @@ start_data *srv_get_start()
     pk = emit_object_vel(pos, v, dir);
     ans->pk = pk;
     ans->calc_id = cnt;
-    ans->N = 50;
+    ans->N = 100;
     ans->h = 30;
     ans->dh = 1e-2;
     cnt++;
@@ -132,7 +132,8 @@ start_data *srv_get_start()
     do
     {
       dir[1] = (((double)rand())/RAND_MAX)*2-1;
-      dir[2] = (((double)rand())/RAND_MAX)*2-1;
+      //dir[2] = (((double)rand())/RAND_MAX)*2-1;
+      dir[2] = 0;
       dir[3] = (((double)rand())/RAND_MAX)*2-1;
     }
     while (dir[1] == 0 && dir[2] == 0 && dir[3] == 0);
@@ -167,6 +168,48 @@ eye get_observer()
 {
   eye obs;
   
+  Lvector npos, ndir, ntop;
+  Lvector ndp;
   
+  real t, r, th, fi;
+  
+  t = 6;
+  r = 6;
+  th = PI/2;
+  fi = PI/2;
+  
+  
+  
+  npos.alloc(4);
+  ndir.alloc(4);
+  ntop.alloc(4);
+  ndp.alloc(4);
+  
+  PRINT_LOG;
+  
+  npos[0] = t;
+  npos[1] = r;
+  npos[2] = th;
+  npos[3] = fi;
+  
+  ntop[0] = 0;
+  ntop[1] = 0;
+  ntop[2] = 1;
+  ntop[3] = 0;
+  
+  ndir[0] = 0;
+  ndir[1] = -1;
+  ndir[2] = 0;
+  ndir[3] = 0;
+  
+  ndp[0] = 10;
+  ndp[1] = 10;
+  ndp[2] = 0.1;
+  ndp[3] = 100;
+  
+  
+  
+  obs.init(npos, ntop, ndir, ndp);
+  PRINT_LOG;
   return obs;
 }
