@@ -13,10 +13,26 @@
 
 #include "tensor.h"
 
-typedef poskas (*runge_fun)(poskas pk);
 
+class solver
+{
+	protected:
+		poskas start;
+		real dl;
+	public:
+		void init(poskas pos, real dh);
+		virtual poskas integrate(real len) = 0;
+		poskas makestep(real len);
+};
 
-poskas runge_run(poskas pos, real dh, real hmax);
-void set_runge_fun(runge_fun sfun);
+class solver_rk4 : public solver
+{
+	poskas runge_kutta4(poskas &pk, real h);
+	public:
+		poskas integrate(real len);
+};
 
 #endif
+
+
+

@@ -12,17 +12,41 @@
 #include "runge.h"
 
 
-
-
-runge_fun fun;
-
-void set_runge_fun(runge_fun sfun)
+void solver::init(poskas pos, real dh)
 {
-  fun = sfun;
+	start = pos;
+	dl = dh;
+}
+
+poskas solver::makestep(real len)
+{
+	poskas pk = integrate(len);
+	start = pk;
+	return pk;
 }
 
 
-poskas runge_kutta4(poskas &pk, real h)
+
+
+poskas solver_rk4::integrate(real len)
+{
+    poskas pk=start;
+    real h = 0;
+    do
+    {
+      poskas pp = runge_kutta4(pk,dl);
+      if (pp.p.dim() != pk.p.dim())
+	throw EDIM;
+      pk = pp;
+      h += dl;
+    } 
+    while(h <= len);
+  
+    return pk;
+}
+
+
+poskas solver_rk4::runge_kutta4(poskas &pk, real h)
 {
 	poskas res, k1, k2, k3, k4;
 	//PRINT_LOG
@@ -34,19 +58,4 @@ poskas runge_kutta4(poskas &pk, real h)
 	return pk + (k1+k2*2+k3*2+k4)/6;
 }
 
-poskas runge_run(poskas pos, real dh, real hmax)
-{
-    poskas pk=pos;
-    real h = 0;
-    do
-    {
-      poskas pp = runge_kutta4(pk,dh);
-      if (pp.p.dim() != pk.p.dim())
-	throw EDIM;
-      pk = pp;
-      h += dh;
-    } 
-    while(h <= hmax);
-  
-    return pk;
-}
+

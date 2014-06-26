@@ -89,17 +89,7 @@ void* recv_server(void* data)
   int calc_id;
   
 //  int i;
-#if LINUX  || MINIX
   FILE *outf = fopen("out", "wt");
-#elif WINDOWS
-  FILE *outf = NULL;
-  errno_t errnum;
-  if (errnum = fopen_s(&outf, "out", "wt") < 0)
-  {
-	  printf_s("error %i\n", errnum);
-	  return NULL;
-  }
-#endif
   if (outf < 0)
   {
     PRINT_LOG

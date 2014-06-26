@@ -39,7 +39,8 @@ static inline poskas geodesic(start_data *sd)
   real h = 0;
   int i = 0;
 
-  set_runge_fun(my_runge_fun);
+  solver *intgr = new solver_rk4;  
+
   
   int d=pk.p.dim();
   
@@ -47,10 +48,15 @@ static inline poskas geodesic(start_data *sd)
   char buf[1000];
   int len;
   
+
+
   mess->calc_id = sd->calc_id;
   mess->dim = d;
     
-  
+  intgr.init(pk, sd->dh);
+  real len0 = sd->h / sd->N;
+	
+
   for (i = 0; i < sd->N; i++)
   {
     mess->pk = pk;
@@ -58,12 +64,14 @@ static inline poskas geodesic(start_data *sd)
     if (sd->id.write(buf,len) == -1) 
       break;
     
-    pk=runge_run(pk,sd->dh,sd->h/sd->N);
+     
+    pk=intgr.makestep(len0);
     
     if (check_pk(pk)==0)
       break;
   }
   
+  delete intgr; 
   delete mess;
   
   
@@ -134,24 +142,12 @@ start_data *get_start(int64_t tid)
 }
 
 
-#if LINUX
 void* geodesic_pthread(void* data)
-#elif MINIX
-void* geodesic_fork(void* data)
-#elif WINDOWS
-DWORD WINAPI geodesic_winthreads( LPVOID data )
-#endif
 {
   start_data *sd;
   int64_t tid;
   
-#if LINUX
   tid = pthread_self();
-#elif WINDOWS
-  tid = GetCurrentThreadId();
-#elif MINIX
-  tid = getpid();
-#endif
   
   bool go = true;
   
@@ -196,12 +192,6 @@ DWORD WINAPI geodesic_winthreads( LPVOID data )
       sd->close();
     }
   }
-#if LINUX
   return NULL;
-#elif WINDOWS
-  return 0;
-#elif MINIX
-  return NULL;
-#endif
-  
 }
+
