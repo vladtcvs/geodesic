@@ -15,11 +15,10 @@
 
 #include <iostream>
 
-#if LINUX
 #include <pthread.h>
-#endif
 
 
+poskas space_diff(poskas pk);
 
 static int check_pk(poskas pk)
 {
@@ -53,7 +52,7 @@ static inline poskas geodesic(start_data *sd)
   mess->calc_id = sd->calc_id;
   mess->dim = d;
     
-  intgr.init(pk, sd->dh);
+  intgr->init(space_diff, pk, sd->dh);
   real len0 = sd->h / sd->N;
 	
 
@@ -65,7 +64,7 @@ static inline poskas geodesic(start_data *sd)
       break;
     
      
-    pk=intgr.makestep(len0);
+    pk=intgr->makestep(len0);
     
     if (check_pk(pk)==0)
       break;

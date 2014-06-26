@@ -80,7 +80,7 @@ tensor3 Kristofel(Lvector p)
 	return res;
 }
 
-poskas my_runge_fun(poskas pk)
+poskas space_diff(poskas pk)
 {
 	
 	int L = pk.v.dim();
@@ -95,3 +95,4 @@ poskas my_runge_fun(poskas pk)
 		res.v[i] -= Gm[i][j][k]*pk.v[j]*pk.v[k];
 	return res;
 }
+

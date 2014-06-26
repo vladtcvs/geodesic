@@ -12,8 +12,9 @@
 #include "runge.h"
 
 
-void solver::init(poskas pos, real dh)
+void solver::init(diff_fun df, poskas pos, real dh)
 {
+	fun = df;
 	start = pos;
 	dl = dh;
 }
