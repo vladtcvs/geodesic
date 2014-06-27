@@ -42,15 +42,9 @@ void ioid::io_open()
   srv_addr.sin_family   = AF_INET;
   srv_addr.sin_port     = htons(2345); 
 
-#if LINUX
   inet_aton(my_ip, &addr.sin_addr);
   inet_aton(server_ip, &srv_addr.sin_addr);
   bind(udpSocket, (struct sockaddr*)&addr, sizeof(addr));
-#elif WINDOWS
-  addr.sin_addr.s_addr = inet_addr(my_ip);
-  srv_addr.sin_addr.s_addr = inet_addr(server_ip);
-  bind(udpSocket, (LPSOCKADDR)&addr, sizeof(addr));
-#endif
 
  
   struct timeval timeout;      
@@ -63,11 +57,7 @@ void ioid::io_open()
 void ioid::io_close()
 {
   msgbuf.clear();
-#if WINDOWS
-  closesocket(udpSocket);
-#elif LINUX
   close(udpSocket);
-#endif
 }
 
 ioid::ioid()
@@ -123,11 +113,7 @@ srv_ioid::~srv_ioid()
 
 int srv_ioid::srv_open()
 {
-#if LINUX || MINIX
   udpSocket = socket(PF_INET, SOCK_DGRAM, 0);
-#elif WINDOWS
-  udpSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-#endif
   sockaddr_in m_addr;
   
   if (udpSocket < 0)
@@ -146,11 +132,7 @@ int srv_ioid::srv_open()
   
   /* Переводим адрес в нужный нам формат */
   m_addr.sin_addr.s_addr = inet_addr(my_ip);
-#if LINUX || MINIX
   int br = bind(udpSocket, (struct sockaddr*)&m_addr, sizeof(m_addr));
-#elif WINDOWS
-  int br = bind(udpSocket, (LPSOCKADDR)&m_addr, sizeof(m_addr));
-#endif
   if (br < 0)
   {
 	printf("Unable to bind socket\n");
@@ -162,11 +144,7 @@ int srv_ioid::srv_open()
 
 void srv_ioid::srv_close()
 {
-#if WINDOWS
-    closesocket(udpSocket);
-#elif LINUX
     close(udpSocket);
-#endif
 }
 
 int srv_ioid::read(char *buf, int maxlen, client_id *client)

@@ -36,15 +36,6 @@ int main(int argc, char **argv)
   int i;
   
   
-#if WINDOWS
-  WSADATA wsaData;
-  int iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-  if (iResult != 0) 
-  {
-    printf("WSAStartup failed: %d\n", iResult);
-    return 1;
-  }
-#endif
   try
   {
   

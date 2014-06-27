@@ -11,6 +11,9 @@
 
 #include "geod.h"
 #include "task.h"
+
+#include "space.h"
+
 real a=20;
 
 
@@ -94,5 +97,10 @@ poskas space_diff(poskas pk)
 	for (k = 0; k < L; k++)
 		res.v[i] -= Gm[i][j][k]*pk.v[j]*pk.v[k];
 	return res;
+}
+
+poskas diff_fun_space::diff(poskas pk)
+{
+	return space_diff(pk);
 }
 

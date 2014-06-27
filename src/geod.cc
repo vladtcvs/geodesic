@@ -13,9 +13,7 @@
 #include "ioid.h"
 #include "start.h"
 
-#if LINUX
 #include <pthread.h>
-#endif
 
 
 #include "client.h"

@@ -24,33 +24,7 @@
 #include "server.h"
 #include "eye.h"
 
-/**
- * Эта функция запускается только на сервере, она сохраняет принятые от клиентов 
- * данные 
- */
-static void save_pos(FILE *outf, poskas pk, int calc_id)
-{
-    int i, L = pk.p.dim();
-    PRINT_LOG
-    //printf("id = %i L = %i ", calc_id, L);
-    fprintf(outf, "%i ", calc_id);
-    for (i = 0; i < L; i++)
-      fprintf(outf, "%lf ", (double)(pk.p[i]));
-    fprintf(outf,"\n");
-    fflush(outf);
-}
-
-static void draw_point(FILE *outf, obspnt pnt)
-{
-  if (pnt.u)
-  {
-    int x = pnt.ang * cos(pnt.dir);
-    int y = pnt.ang * sin(pnt.dir);
-    fprintf(outf, "%lf %lf\n", x, y);
-    
-  }
-}
-
+#include "save.h"
 
 sd_stel::sd_stel()
 {
@@ -76,7 +50,7 @@ void* recv_server(void* data)
   int len = 1000;
   char buf[1000];
   
-  eye observer = get_observer();
+//  eye observer = get_observer();
   
   
   std::list<sd_stel> sval;
@@ -129,22 +103,7 @@ void* recv_server(void* data)
 			
 			
 			PRINT_LOG
-			
-			if (calc_id >= 0)
-			{
-			  push_pos(pk);
-			}
-			
-			else
-			{
-			  if (observer.if_in_eye(pk))
-			    save_pos(outf, pk, calc_id);
-			/*  obspnt op = observer.observe(pk);
-			  if (op.u)
-			  {
-			    draw_point(outf, op);
-			  }*/
-			}
+			use_result(pk, outf, calc_id);		
 	      }
 	      break;
 	    case GD_GETNEW:

@@ -12,7 +12,7 @@
 #include "runge.h"
 
 
-void solver::init(diff_fun df, poskas pos, real dh)
+void solver::init(diff_fun* df, poskas pos, real dh)
 {
 	fun = df;
 	start = pos;
@@ -52,10 +52,10 @@ poskas solver_rk4::runge_kutta4(poskas &pk, real h)
 	poskas res, k1, k2, k3, k4;
 	//PRINT_LOG
 	
-	k1 = fun(pk)*h;
-	k2 = fun(pk + k1/2)*h;
-	k3 = fun(pk + k2/2)*h;
-	k4 = fun(pk + k3)*h;
+	k1 = fun->diff(pk)*h;
+	k2 = fun->diff(pk + k1/2)*h;
+	k3 = fun->diff(pk + k2/2)*h;
+	k4 = fun->diff(pk + k3)*h;
 	return pk + (k1+k2*2+k3*2+k4)/6;
 }
 

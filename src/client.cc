@@ -12,13 +12,12 @@
 #include "start.h"
 #include "message.h"
 #include "runge.h"
-
+#include "space.h"
 #include <iostream>
 
 #include <pthread.h>
 
 
-poskas space_diff(poskas pk);
 
 static int check_pk(poskas pk)
 {
@@ -40,6 +39,7 @@ static inline poskas geodesic(start_data *sd)
 
   solver *intgr = new solver_rk4;  
 
+  diff_fun *df = new diff_fun_space;
   
   int d=pk.p.dim();
   
@@ -52,7 +52,7 @@ static inline poskas geodesic(start_data *sd)
   mess->calc_id = sd->calc_id;
   mess->dim = d;
     
-  intgr->init(space_diff, pk, sd->dh);
+  intgr->init(df, pk, sd->dh);
   real len0 = sd->h / sd->N;
 	
 
@@ -72,7 +72,7 @@ static inline poskas geodesic(start_data *sd)
   
   delete intgr; 
   delete mess;
-  
+  delete df;
   
   return pk;
 }

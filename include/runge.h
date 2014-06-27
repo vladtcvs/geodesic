@@ -13,16 +13,22 @@
 
 #include "tensor.h"
 
-typedef poskas (*diff_fun)(poskas pk);
+
+class diff_fun
+{
+	public:
+		virtual poskas diff(poskas pk) = 0;
+};
+
 
 class solver
 {
 	protected:
 		poskas start;
 		real dl;
-		diff_fun fun;
+		diff_fun* fun;
 	public:
-		void init(diff_fun df, poskas pos, real dh);
+		void init(diff_fun* df, poskas pos, real dh);
 		virtual poskas integrate(real len) = 0;
 		poskas makestep(real len);
 };

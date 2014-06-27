@@ -18,6 +18,8 @@
 #include <list>
 
 #include "eye.h"
+#include "save.h"
+
 
 const real PI = 3.1415926535897932384626433832795;
 
@@ -156,6 +158,28 @@ start_data *srv_get_start()
 }
 
 
+void use_result(poskas pk, FILE *outf, int calc_id)
+{
+	if (calc_id >= 0)
+        {
+        //                push_pos(pk);
+        	save_pos(outf, pk, calc_id);
+        }
+            
+        else
+        {
+        	//if (observer.if_in_eye(pk))
+                save_pos(outf, pk, calc_id);
+                //obspnt op = observer.observe(pk);
+                //if (op.u)
+                //{
+               		//  draw_point(outf, op);
+                 //}
+        } 
+
+}
+
+
 
 void push_pos(poskas pk)
 {
@@ -213,3 +237,5 @@ eye get_observer()
   PRINT_LOG;
   return obs;
 }
+
+

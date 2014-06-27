@@ -1,4 +1,4 @@
-/** File geod.h author Vladislav Tcendrovskii
+/** File save.h author Vladislav Tcendrovskii
  *  Copyright (c) 2013
  *  This source subjected to the Gnu General Public License v3 or later (see LICENSE)
  *  All other rights reserved
@@ -9,32 +9,15 @@
  * */
 
 
-#ifndef GEOD_H
-#define GEOD_H
-#include <math.h>
-#include <stdlib.h>
-#include <vector>
+
+#ifndef SAVE_H
+#define SAVE_H
+
 #include <stdio.h>
+#include "geod.h"
+#include "eye.h"
 
-
-#include "tensor.h"
-
-
-
-
-extern const real H;
-
-
-
-
-
-
-
-extern char server_ip[20];
-extern char my_ip[20];
-
-
-#define DIM 4
-
+void save_pos(FILE *outf, poskas pk, int calc_id);
+void draw_point(FILE *outf, obspnt pnt);
 
 #endif
