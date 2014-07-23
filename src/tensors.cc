@@ -10,10 +10,7 @@
 
 #include "geod.h"
 
-
-
-
-
+#include "tensor.h"
 
 
 poskas poskas::operator + (poskas pos)

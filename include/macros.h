@@ -12,11 +12,9 @@
 #define MACROS_H
 
 
-#define WINDOWS 0
-#define MINIX  0
-#define LINUX 1
-
 #include <stdio.h>
+//#define DEBUG
+
 
 #ifdef DEBUG
 #define PRINT_LOG printf("%s (%s:%i)\n", __FUNCTION__, __FILE__, __LINE__);

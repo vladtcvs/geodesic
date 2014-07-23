@@ -14,8 +14,9 @@
 #define SAVE_H
 
 #include <stdio.h>
-#include "geod.h"
-#include "eye.h"
+
+#include <geod.h>
+#include <eye.h>
 
 void save_pos(FILE *outf, poskas pk, int calc_id);
 void draw_point(FILE *outf, obspnt pnt);

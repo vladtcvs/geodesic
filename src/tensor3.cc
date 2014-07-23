@@ -8,7 +8,8 @@
  *  OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  * */
 
-#include "tensor.h"
+#include <geod.h>
+#include <tensor.h>
 
 tensor3::tensor3()
 {

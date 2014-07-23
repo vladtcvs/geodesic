@@ -12,7 +12,8 @@
 #ifndef __EYE_H__
 #define __EYE_H__
 
-#include "geod.h"
+#include <geod.h>
+#include <tensor.h>
 
 struct obspnt
 {

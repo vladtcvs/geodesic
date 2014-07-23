@@ -16,11 +16,10 @@
 #include <vector>
 #include <stdio.h>
 
+#define LINUX
+#undef WINDOWS
 
-#include "tensor.h"
-
-
-
+typedef long double real;
 
 extern const real H;
 
@@ -28,10 +27,6 @@ extern const real H;
 
 
 
-
-
-extern char server_ip[20];
-extern char my_ip[20];
 
 
 #define DIM 4

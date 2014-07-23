@@ -35,7 +35,7 @@ int main(int argc, char **argv)
  
   
     start_data sd;
-    int numCPU = 2;
+    int numCPU = 1;
     
     
     numCPU = sysconf(_SC_NPROCESSORS_ONLN);;
@@ -47,15 +47,18 @@ int main(int argc, char **argv)
     std::cout<<"Machine with "<<numCPU<<" CPU\n";
     std::cout<<"\n";
     
-    if (argc > 1)
-    {
-      strcpy(server_ip, argv[1]);
-    }
+    char srvip[]="127.0.0.1";
+    char *sip;
+    if (argc < 2)
+      sip=srvip;
+    else 
+      sip=argv[1];
+    
     
     for (i = 0; i < nthr; i++)
     {
       
-	  int res = pthread_create(&(pth[i]), NULL, geodesic_pthread, NULL);
+	  int res = pthread_create(&(pth[i]), NULL, geodesic_pthread, sip);
 	  // ждем, чтобы поток успел скопировать данные
 	  usleep(100000);
      }

@@ -11,12 +11,9 @@
 #ifndef SPACE_H
 #define SPACE_H
 
-#include "runge.h"
+#include <geod.h>
+#include <runge.h>
 
-
-tensor2 dGi(Lvector p, int n);
-tensor3 Kristofel(Lvector p);
-poskas space_diff(poskas pk);
 
 
 class diff_fun_space : public diff_fun

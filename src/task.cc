@@ -8,22 +8,21 @@
  *  OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  * */
 
-
-#include "geod.h"
-#include "start.h"
-
-#include "message.h"
-#include "emit.h"
 #include <stdlib.h>
 #include <list>
 
-#include "eye.h"
-#include "save.h"
+
+
+#include <geod.h>
+#include <start.h>
+#include <emit.h>
+#include <eye.h>
+#include <save.h>
 
 
 const real PI = 3.1415926535897932384626433832795;
 
-static real sqr(real x)
+static inline real sqr(real x)
 {
   return x*x;
 }
@@ -69,14 +68,11 @@ struct light_src
   int nl;
 };
 
-std::list<light_src> pnt;
+static std::list<light_src> pnt;
 
 
 start_data *srv_get_start()
 {
-  
-  
-  
   start_data *ans;
   
   ans = new start_data;
@@ -145,7 +141,7 @@ start_data *srv_get_start()
       s += sqr(dir[i]);
     s = sqrt(s);
     dir /= s;
-    pk=emit_object_vel(pk.p, 1, dir);
+    pk=emit_light(pk.p, dir);
     ans->pk = pk;
     ans->calc_id = lcnt;
     ans->N = 100;
@@ -157,12 +153,18 @@ start_data *srv_get_start()
   return ans;
 }
 
+void push_pos(poskas pk)
+{
+  light_src lsr={pk,20};
+  pnt.push_back(lsr);
+}
 
 void use_result(poskas pk, FILE *outf, int calc_id)
 {
 	if (calc_id >= 0)
         {
-        //                push_pos(pk);
+		PRINT_LOG
+                push_pos(pk);
         	save_pos(outf, pk, calc_id);
         }
             
@@ -181,11 +183,7 @@ void use_result(poskas pk, FILE *outf, int calc_id)
 
 
 
-void push_pos(poskas pk)
-{
-  light_src lsr={pk,20};
-  pnt.push_back(lsr);
-}
+
 
 
 eye get_observer()

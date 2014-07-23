@@ -8,14 +8,16 @@
  *  OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  * */
 
-#include "geod.h"
-#include "start.h"
-#include "message.h"
-#include "runge.h"
-#include "space.h"
 #include <iostream>
-
 #include <pthread.h>
+
+
+
+#include <geod.h>
+#include <start.h>
+#include <message.h>
+#include <runge.h>
+#include <space.h>
 
 
 
@@ -81,15 +83,14 @@ static inline poskas geodesic(start_data *sd)
 
 
 
-start_data *get_start(int64_t tid)
+start_data *get_start(int64_t tid, ioid id)
 {
   start_data* sd;
   
-  ioid id;
+  
   
   char buf[1000];
   
-  id.io_open();
   
   msg *mg = new msg_getnew;
  
@@ -145,6 +146,11 @@ void* geodesic_pthread(void* data)
 {
   start_data *sd;
   int64_t tid;
+  char *s_ip = (char*)data;
+  
+  ioid id;
+  id.io_open(s_ip);
+  
   
   tid = pthread_self();
   
@@ -156,7 +162,7 @@ void* geodesic_pthread(void* data)
     {
       while (1)
       {
-	sd = get_start(tid);
+	sd = get_start(tid, id);
 	if (sd == NULL)
 	{	
 	  PRINT_LOG
@@ -174,7 +180,7 @@ void* geodesic_pthread(void* data)
 	int len = encode(buf, 1000, mf);
 	sd->id.write(buf,len);
 	delete mf;   
-	sd->close();
+	
       }
     }
     catch(int err)
@@ -188,9 +194,10 @@ void* geodesic_pthread(void* data)
       int len = encode(buf, 1000, mf);
       sd->id.write(buf,len);
       delete mf;
-      sd->close();
+      
     }
   }
+  id.io_close();
   return NULL;
 }
 

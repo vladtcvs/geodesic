@@ -98,7 +98,6 @@ void* recv_server(void* data)
 			msg_poskas *pos = (msg_poskas*)rec;
 			calc_id = pos->calc_id;
 			pk=pos->pk;
-			std::list<sd_stel>::iterator it;
 			
 			
 			

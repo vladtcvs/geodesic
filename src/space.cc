@@ -9,16 +9,15 @@
  * */
 
 
-#include "geod.h"
-#include "task.h"
+#include <geod.h>
+#include <task.h>
 
-#include "space.h"
+#include <space.h>
 
 real a=20;
 
 
-
-tensor2 dGi(Lvector p, int n)
+static inline tensor2 dGi(Lvector p, int n)
 {
 	int L = p.dim();
 	tensor2 res(L);
@@ -46,7 +45,7 @@ tensor2 dGi(Lvector p, int n)
 
 
 
-tensor3 Kristofel(Lvector p)
+static inline tensor3 Kristofel(Lvector p)
 {
 	int L = p.dim();
 	tensor3 res(L), kr(L);
@@ -83,7 +82,7 @@ tensor3 Kristofel(Lvector p)
 	return res;
 }
 
-poskas space_diff(poskas pk)
+static inline  poskas space_diff(poskas pk)
 {
 	
 	int L = pk.v.dim();

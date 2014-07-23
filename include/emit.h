@@ -13,9 +13,11 @@
 #ifndef __EMIT_H__
 #define __EMIT_H__
 
-#include "geod.h"
+#include <geod.h>
+#include <tensor.h>
 
 poskas emit_object_vel(Lvector pos, double vel, Lvector dir);
+poskas emit_light(Lvector pos, Lvector dir);
 
 
 #endif /* __EMIT_H__ */

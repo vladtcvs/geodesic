@@ -12,9 +12,9 @@
 
 
 #include <stdio.h>
-#include "geod.h"
 
-#include "save.h"
+#include <geod.h>
+#include <save.h>
 /**
  * Эта функция запускается только на сервере, она сохраняет принятые от клиентов 
  * данные 

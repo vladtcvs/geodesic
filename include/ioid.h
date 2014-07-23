@@ -11,32 +11,20 @@
 #ifndef __IOID_H__
 #define __IOID_H__
 
-#include "geod.h"
-
-#if WINDOWS
-
-#include <winsock.h>
-
-#elif LINUX || MINIX
-
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 
-#endif
+#include <geod.h>
+#include <tensor.h>
 
 class ioid
 {
    std::vector<double> msgbuf;
-#if WINDOWS
-   SOCKET udpSocket;
-   int tid;
-#elif LINUX || MINIX
    int udpSocket;   
    pid_t tid;
-#endif
    
    struct sockaddr_in srv_addr;
    
@@ -44,7 +32,7 @@ class ioid
       ioid();
       ~ioid();
       void setlen(int l);
-      void io_open();
+      void io_open(const char* server_ip);
       void io_close();
       int write(char *buf, int len);
       int read(char *buf, int len);
@@ -54,11 +42,7 @@ class ioid
 struct client_id
 {
   sockaddr_in c_addr;
-#if LINUX || MINIX
   socklen_t c_addr_l;
-#elif WINDOWS
-  int c_addr_l;
-#endif
   client_id();
   char *client_name();
 };
@@ -66,11 +50,7 @@ struct client_id
 
 class srv_ioid
 {
-#if WINDOWS
-   SOCKET udpSocket;
-#elif LINUX || MINIX
    int udpSocket;
-#endif
 public:
    srv_ioid();
    ~srv_ioid();
@@ -89,6 +69,8 @@ void save_pos(poskas pk, int io_id);
 
 
 
+
+extern char my_ip[20];
 
 
 

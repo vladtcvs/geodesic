@@ -12,8 +12,9 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
-#include "tensor.h"
-#include "start.h"
+#include <geod.h>
+#include <tensor.h>
+#include <start.h>
 
 enum Msgtype {GD_NONE, GD_POSKAS, GD_FIN, GD_GETNEW, GD_START, GD_SIGNAL};
 enum Sigtype {GD_S_NONE, GD_S_WAIT, GD_S_END};
@@ -23,11 +24,7 @@ protected:
   Msgtype type;
   
 public:
-#if LINUX || MINIX
   int64_t thread;
-#elif WINDOWS
-  int64_t thread;
-#endif
   Msgtype mtype();
   msg();
 };

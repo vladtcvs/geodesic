@@ -14,10 +14,11 @@
 
 #include <vector>
 #include <math.h>
-#include "macros.h"
-#include "errors.h"
 
-typedef long double real;
+
+#include <macros.h>
+#include <errors.h>
+#include <geod.h>
 
 
 #define BAD_DOUBLE 1.2345678987654321

@@ -9,20 +9,16 @@
  * */
 
 
-
-#include "geod.h"
-#include "ioid.h"
-#include "start.h"
-
-#if LINUX
 #include <pthread.h>
-#endif
-
-#include "errors.h"
-
-#include "server.h"
 #include <iostream>
 #include <string.h>
+
+
+#include <geod.h>
+#include <ioid.h>
+#include <start.h>
+#include <errors.h>
+#include <server.h>
 
 const int deflen = 4;
 const real eps=1e-7;

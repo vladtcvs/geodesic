@@ -10,24 +10,24 @@
 
 
 #include <stdio.h>
-#include "geod.h"
-#include "ioid.h"
-#include "start.h"
-
 #include <string.h>
 #include <sys/types.h>
 #include <stdlib.h>
 
-#include "message.h"
 
-char server_ip[20]="127.0.0.1";
+
+#include <geod.h>
+#include <ioid.h>
+
+
+
 
 char my_ip[20]="0.0.0.0";
 
 
 
 
-void ioid::io_open()
+void ioid::io_open(const char* server_ip)
 {
   struct sockaddr_in addr;
   udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
@@ -78,10 +78,7 @@ void ioid::setlen(int l)
   
 /**
  * Эта функция запускается на клиентах. 
- * С ее помощью они посылают результаты расчетов на сервер в 
- * формате double 
- * первое число - тип сообщения (msg_type), потом номер расчета (calc_id), 
- * дальше идут векторы позиции и касательной
+ * С ее помощью они посылают результаты расчетов на сервер
  */
 int ioid::write(char * buf, int len)
 {

@@ -23,7 +23,7 @@ struct start_data
   int N;
   ioid id;
   int calc_id;
-  void close();
+  void close(){};
 };
 
 start_data* get_start(void);

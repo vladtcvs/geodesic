@@ -21,6 +21,7 @@
 #define EMEM	3
 #define ETYPE	4
 #define EIND	5
+#define EMETR	6
 
 std::string error_str(int errnum);
 

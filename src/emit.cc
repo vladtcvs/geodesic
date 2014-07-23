@@ -14,9 +14,59 @@
 #include "task.h"
 
 #include "errors.h"
+
 /**
  * This function creates new object, moving with speed vel and
- * with random direction
+ * with direction dir
+ */
+poskas emit_light(Lvector pos, Lvector dir)
+{
+  poskas res;
+  tensor2 G = Metric(pos);
+  int i, j;
+  int D = dir.dim(); 
+  real a = 0, b = 0, k=G[0][0];
+  
+  for (i = 1; i < D; i++)
+  for (j = 1; j < D; j++)
+    b += G[i][j]*dir[i]*dir[j];
+  
+  for (i = 1; j < D; i++)
+    a += G[0][i]*dir[i];
+  
+  if (fabs(k) < eps)
+    throw EMETR;
+  b /= k;
+  a /= k;
+  
+  if (b >= 0)
+    throw EMETR;
+  
+  real x0 = -a + sqrt(a*a-b);
+  
+  res.p = pos;
+  res.v = dir;
+  res.v[0] = x0;
+
+#ifdef DEBUG
+  real s = 0;
+  for (i = 0; i < D; i++)
+  for (j = 0; j < D; j++)
+    s += G[i][j]*res.v[i]*res.v[j];
+  if (fabs(s) > eps)
+  {
+    printf("emit error\n");
+    throw EMETR;
+  }
+#endif
+
+  return res;
+}
+
+
+/**
+ * This function creates new object, moving with speed vel and
+ * with  direction dir
  */
 poskas emit_object_vel(Lvector pos, double vel, Lvector dir)
 {
